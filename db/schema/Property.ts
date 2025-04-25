@@ -6,12 +6,12 @@ export const PropertySchema = tableSchema({
       { name: 'owner_id', type: 'string', isIndexed: true },
       { name: 'property_ref_no', type: 'string' },
       { name: 'address', type: 'string' },
-      { name: 'geolocation', type: 'string' }, // URL
+      { name: 'geolocation', type: 'string' },
       { name: 'assess_payment', type: 'string' },
       { name: 'payment_expiry_date', type: 'number' },
       { name: 'type', type: 'string' },
       { name: 'notes', type: 'string' },
-      { name: 'images', type: 'string' }, // Maybe JSON encoded
+      { name: 'images', type: 'string' },
     ],
   })
   
