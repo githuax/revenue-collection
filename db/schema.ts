@@ -8,7 +8,7 @@ import { PropertySchema } from "./schema/Property";
 import { UserSchema } from "./schema/User";
 import { LoginHistorySchema } from "./schema/LoginHistory";
 
-export const myAppSchema = appSchema({
+const schema = appSchema({
   version: 1,
   tables: [
     PayerSchema,
@@ -20,3 +20,5 @@ export const myAppSchema = appSchema({
     LoginHistorySchema
   ],
 })
+
+export default schema;
