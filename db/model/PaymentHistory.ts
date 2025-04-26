@@ -1,8 +1,13 @@
 import { Model } from '@nozbe/watermelondb'
-import { field, date, readonly, relation } from '@nozbe/watermelondb/decorators'
+import { field, date, readonly, relation, immutableRelation } from '@nozbe/watermelondb/decorators'
+import { Associations } from '@nozbe/watermelondb/Model'
 
 export default class PaymentHistory extends Model {
   static table = 'payment_histories'
+
+  static associations: Associations = {
+    payments: { type: 'belongs_to', key: 'payment_id' },
+}
 
   @field('field') fieldName
   @field('old_value') oldValue
@@ -10,5 +15,5 @@ export default class PaymentHistory extends Model {
   @field('created_by') createdBy
   @readonly @date('created_datetime') createdDate
 
-  @relation('payments', 'payment_id') payment
+  @immutableRelation('payments', 'payment_id') payment
 }

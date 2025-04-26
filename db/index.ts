@@ -21,6 +21,7 @@ const adapter = new SQLiteAdapter({
   // migrations,
   jsi: true,
   onSetUpError: (error) => {
+    console.warn('Error setting up database:', error);
   },
 });
 

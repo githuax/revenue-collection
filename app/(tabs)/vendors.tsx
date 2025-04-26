@@ -10,6 +10,7 @@ import {
   StatusBar
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // Mock data for vendors
 const MOCK_VENDORS = [
@@ -188,7 +189,9 @@ const VendorScreen = () => {
       {/* Add Vendor FAB */}
       <TouchableOpacity 
         className="absolute bottom-6 right-6 bg-secondary rounded-full w-16 h-16 justify-center items-center shadow-lg"
-        onPress={() => console.log('Add new vendor')}
+        onPress={() => {
+          router.push('/vendors/add');
+        }}
       >
         <Feather name="plus" size={24} color="white" />
       </TouchableOpacity>

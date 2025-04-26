@@ -178,7 +178,7 @@ const Home = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Payments</Text>
         <TouchableOpacity style={styles.addButton}>
-          <Text style={styles.addButtonText}>+ New Vendor</Text>
+          <Text style={styles.addButtonText}>+ New Payment</Text>
         </TouchableOpacity>
       </View>
 
