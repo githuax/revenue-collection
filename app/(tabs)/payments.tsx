@@ -14,6 +14,8 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
+import database from '~/db';
+
 // Mock data for payments
 const MOCK_PAYMENTS = [
   { id: '1', vendorName: 'TechSolutions Inc.', amount: 1200, date: '2025-04-15', status: 'Completed', method: 'Bank Transfer', reference: 'PMT-2025-001' },
@@ -27,6 +29,11 @@ const MOCK_PAYMENTS = [
   { id: '9', vendorName: 'Pet Paradise', amount: 540, date: '2025-03-21', status: 'Pending', method: 'Bank Transfer', reference: 'PMT-2025-009' },
   { id: '10', vendorName: 'Hardware Haven', amount: 1100, date: '2025-03-18', status: 'Completed', method: 'Credit Card', reference: 'PMT-2025-010' },
 ];
+
+const getPayments = async () => {
+  const payments = await database.collections.get('payments').query().fetch();
+  return payments;
+}
 
 const PaymentRecordScreen = () => {
   const [payments, setPayments] = useState([]);
@@ -45,6 +52,10 @@ const PaymentRecordScreen = () => {
   });
   
   useEffect(() => {
+    getPayments().then(data => {
+      console.log('Fetched payments:', data);
+    })
+
     // Simulate API fetch
     setTimeout(() => {
       setPayments(MOCK_PAYMENTS);

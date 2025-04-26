@@ -18,6 +18,9 @@ import * as Location from 'expo-location';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 
+import database from '~/db';
+import Payment from '~/db/model/Payment';
+
 // Mock data for vendors
 const MOCK_VENDORS = [
   { id: '1', name: 'TechSolutions Inc.', tpin: 'TP12345', phoneNumber: '555-123-4567', address: '123 Tech Blvd, Silicon Valley' },
@@ -131,32 +134,6 @@ const NewPaymentScreen = ({ navigation }) => {
     }
   };
 
-  // Handle barcode scanning
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    setShowCamera(false);
-    
-    // Process QR code data - in a real app, you would parse the data properly
-    try {
-      // This is a simplified example - assume QR data has format "TPIN:TP12345"
-      if (data.startsWith('TPIN:')) {
-        const tpin = data.split(':')[1];
-        const vendor = MOCK_VENDORS.find(v => v.tpin === tpin);
-        if (vendor) {
-          setSelectedVendor(vendor);
-          setSearchQuery(vendor.name);
-        } else {
-          Alert.alert('Vendor Not Found', `No vendor found with TPIN: ${tpin}`);
-        }
-      } else {
-        // Try to use the data as a search query
-        setSearchQuery(data);
-      }
-    } catch (error) {
-      Alert.alert('Invalid QR Code', 'The scanned QR code format is not recognized');
-    }
-  };
-
   // Handle vendor selection
   const selectVendor = (vendor) => {
     setSelectedVendor(vendor);
@@ -165,11 +142,11 @@ const NewPaymentScreen = ({ navigation }) => {
   };
 
   // Handle payment submission
-  const handleSubmitPayment = () => {
-    if (!selectedVendor) {
-      Alert.alert('Error', 'Please select a vendor');
-      return;
-    }
+  const handleSubmitPayment = async () => {
+    // if (!selectedVendor) {
+    //   Alert.alert('Error', 'Please select a vendor');
+    //   return;
+    // }
     
     if (!amount || parseFloat(amount) <= 0) {
       Alert.alert('Error', 'Please enter a valid amount');
@@ -177,39 +154,48 @@ const NewPaymentScreen = ({ navigation }) => {
     }
     
     // Create payment object
-    const payment = {
-      vendorId: selectedVendor.id,
-      vendorName: selectedVendor.name,
-      amount: parseFloat(amount),
-      reference: reference,
-      date: date.toISOString().split('T')[0],
-      method: paymentMethod,
-      description: description,
-      location: location ? {
-        latitude: location.latitude,
-        longitude: location.longitude
-      } : null,
-      status: 'Completed',
-      timestamp: new Date().toISOString()
-    };
-    
-    // In a real app, you would send this to an API
-    console.log('Payment submitted:', payment);
-    
-    // Show success message
+    // const payment = {
+    //   vendorId: selectedVendor.id,
+    //   vendorName: selectedVendor.name,
+    //   amount: parseFloat(amount),
+    //   reference: reference,
+    //   date: date.toISOString().split('T')[0],
+    //   method: paymentMethod,
+    //   description: description,
+    //   location: location ? {
+    //     latitude: location.latitude,
+    //     longitude: location.longitude
+    //   } : null,
+    //   status: 'Completed',
+    //   timestamp: new Date().toISOString()
+    // };
+
+    database.write(async () => {
+      const payment = await database.get<Payment>('payments').create(payment => {
+        payment.amount = parseFloat(amount);
+        payment.paymentType = paymentMethod;
+        payment.location = location
+      })
+    }).then(() => {
+      console.log('Payment saved successfully');
+
+          // Show success message
     Alert.alert(
       'Payment Recorded',
-      `Payment of $${amount} to ${selectedVendor.name} has been recorded successfully.`,
+      `Payment of $${amount} to has been recorded successfully.`,
       [
         { 
           text: 'OK', 
           onPress: () => {
-            // Reset form or navigate back
-            navigation?.goBack() || console.log('Navigate back');
+            router.back()
           }
         }
       ]
     );
+    }).catch((error) => {
+      console.error('Error saving payment:', error);
+      Alert.alert('Error', 'Failed to record payment');
+    })
   };
 
   // Format date to string
@@ -284,7 +270,7 @@ const NewPaymentScreen = ({ navigation }) => {
           <Text className="text-white/80 text-sm">Record a new payment</Text>
         </View>
         <TouchableOpacity 
-          onPress={() => navigation?.goBack() || console.log('Navigate back')}
+          onPress={() => router.back()}
           className="p-2"
         >
           <Feather name="x" size={24} color="white" />
@@ -338,11 +324,11 @@ const NewPaymentScreen = ({ navigation }) => {
               
               {/* Search Results */}
               {searchResults.length > 0 && (
-                <View className="absolute top-full left-0 right-0 bg-white rounded-lg mt-1 border border-gray-300 shadow-md z-10">
+                <View className="absolute top-full left-0 right-0 bg-white rounded-lg mt-1 border border-gray-300 shadow-md z-20">
                   {searchResults.map((vendor) => (
                     <TouchableOpacity
                       key={vendor.id}
-                      className="p-3 border-b border-gray-100"
+                      className="p-3 border-b border-gray-100 z-10"
                       onPress={() => selectVendor(vendor)}
                     >
                       <Text className="text-text font-medium">{vendor.name}</Text>
