@@ -37,7 +37,7 @@ const Profile = () => {
   const [editingUser, setEditingUser] = useState(false);
   const [tempUser, setTempUser] = useState(MOCK_USER);
 
-  const { logout } = useAuthStore();
+  const { user: storeUser, userData, logout } = useAuthStore();
   
   const [addingPayer, setAddingPayer] = useState(false);
   const [newPayer, setNewPayer] = useState({
@@ -131,12 +131,12 @@ const Profile = () => {
           <View style={styles.profileHeader}>
             <View style={styles.profileAvatar}>
               <Text style={styles.profileInitials}>
-                {user.name.split(' ').map(part => part[0]).join('')}
+                {userData?.first_name.charAt(0)}{userData?.last_name.charAt(0)}
               </Text>
             </View>
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{user.name}</Text>
-              <Text style={styles.profileId}>ID: {user.id}</Text>
+              <Text style={styles.profileName}>{userData?.first_name} {userData?.last_name}</Text>
+              <Text style={styles.profileId}>ID: {userData?.id}</Text>
               <Text style={styles.profileDepartment}>{user.department}</Text>
               <Text style={styles.profilePosition}>{user.position}</Text>
             </View>
@@ -154,11 +154,11 @@ const Profile = () => {
           <View style={styles.profileDetails}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Email</Text>
-              <Text style={styles.detailValue}>{user.email}</Text>
+              <Text style={styles.detailValue}>{storeUser?.email}</Text>
             </View>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Phone</Text>
-              <Text style={styles.detailValue}>{user.phone}</Text>
+              <Text style={styles.detailValue}>{storeUser?.phone}</Text>
             </View>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Jurisdiction</Text>

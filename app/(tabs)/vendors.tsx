@@ -190,7 +190,7 @@ const VendorScreen = () => {
       <TouchableOpacity 
         className="absolute bottom-6 right-6 bg-secondary rounded-full w-16 h-16 justify-center items-center shadow-lg"
         onPress={() => {
-          router.push('/vendors/add');
+          router.push('/(vendor)/add');
         }}
       >
         <Feather name="plus" size={24} color="white" />

@@ -1,10 +1,12 @@
-import { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
+import { UserData } from "~/types";
 
+import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "~/utils/supabase";
 
 type AuthStore = {
     user: User | null;
+    userData: UserData | null;
     session: Session | null;
     login: (email: string, password: string) => void;
     logout: () => void;
@@ -12,6 +14,7 @@ type AuthStore = {
 
 const useAuthStore = create<AuthStore>((set) => ({
     user: null,
+    userData: null,
     session: null,
     login: async (email: string, password: string) => {
         if(!email || !password) {
@@ -27,11 +30,19 @@ const useAuthStore = create<AuthStore>((set) => ({
         
         set({ user: data.user });
         set({ session: data.session });
+
+        const userData = await supabase.from('user').select('*').eq('user_auth_id', data.user?.id).single()
+        if (userData.error) {
+            console.error("User data error:", userData.error);
+            throw userData.error
+        }
+        set({ userData: userData.data as UserData });
     },
     logout: async () => {
         await supabase.auth.signOut();
         set({ user: null });
         set({ session: null });
+        set({ userData: null });
     }
 }));
 
