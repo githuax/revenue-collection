@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import useAuthStore from '~/store/authStore';
 
 // This would be your app's actual logo
 const LogoPlaceholder = () => (
@@ -31,19 +32,16 @@ const LoginScreen = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  return (
-    <Redirect href={'/(tabs)'} />
-  )
+  const { user, login } = useAuthStore();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/(tabs)');
+    }
+  }, [user]);
 
   const handleLogin = () => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle successful login
-      console.log('Login with:', email, password);
-      router.push('/(tabs)')
-    }, 1500);
+    login(email, password)
   };
 
   return (

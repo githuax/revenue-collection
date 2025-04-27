@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import useAuthStore from '~/store/authStore';
 
 // Mock user data
 const MOCK_USER = {
@@ -35,6 +36,8 @@ const Profile = () => {
   const [user, setUser] = useState(MOCK_USER);
   const [editingUser, setEditingUser] = useState(false);
   const [tempUser, setTempUser] = useState(MOCK_USER);
+
+  const { logout } = useAuthStore();
   
   const [addingPayer, setAddingPayer] = useState(false);
   const [newPayer, setNewPayer] = useState({
@@ -267,7 +270,9 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
         
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => {
+          logout();
+        }}>
           <Text style={styles.logoutButtonText}>Log Out</Text>
         </TouchableOpacity>
         
