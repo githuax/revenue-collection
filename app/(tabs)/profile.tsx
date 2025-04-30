@@ -14,6 +14,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import RegisterNewPropertyModal from '~/components/modals/RegisterNewPropertyModal';
+import RegistrationSection from '~/components/settings/RegistrationSection';
 import useAuthStore from '~/store/authStore';
 
 // Mock user data
@@ -40,6 +42,7 @@ const Profile = () => {
   const { user: storeUser, userData, logout } = useAuthStore();
   
   const [addingPayer, setAddingPayer] = useState(false);
+  const [addingProperty, setAddingProperty] = useState(false);
   const [newPayer, setNewPayer] = useState({
     name: '',
     type: 'Business', // 'Business' or 'Individual'
@@ -252,6 +255,13 @@ const Profile = () => {
             </View>
           ))}
         </View>
+
+        <RegistrationSection 
+          title='Property Management'
+          recentPayers={recentPayers}
+          addButtonText='Register New Property'
+          setIsVisible={setAddingProperty}
+        />
         
         {/* Other Settings */}
         {renderSectionHeader('App Settings')}
@@ -527,6 +537,11 @@ const Profile = () => {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      <RegisterNewPropertyModal 
+        visible={addingProperty}
+        setIsVisible={setAddingProperty}
+      />
     </SafeAreaView>
   );
 };

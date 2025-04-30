@@ -21,6 +21,28 @@ const STATES = [
     }
 ] as const;
 
+const PROPERTY_TYPES = [
+    'House',
+    'Apartment',
+    'Commercial',
+    'Other'
+] as const;
+
+const PAYMENT_TYPES = [
+    'Rates',
+    'License',
+    'Tax',
+    'Other'
+]
+
+const PAYMENT_METHODS = [
+    'Credit Card',
+    'Debit Card',
+    'Bank Transfer',
+    'Cash',
+    'Other'
+] as const;
+
 export {
     STATES
 }

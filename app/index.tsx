@@ -34,6 +34,10 @@ const LoginScreen = () => {
 
   const { user, login } = useAuthStore();
 
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   useEffect(() => {
     if (user) {
       router.push('/(tabs)');
