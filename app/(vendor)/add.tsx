@@ -7,14 +7,18 @@ import Switch from '~/components/Switch'
 import Select from '~/components/Select'
 import StatusModal from '~/components/modals/Status'
 
+import database, { payersCollection } from '~/db'
+import Payer from '~/db/model/Payer'
+import { router } from 'expo-router'
+
 export default function Add() {
-  const [ firstName, setFirstName ] = useState<string>('');
-  const [ lastName, setLastName ] = useState<string>('');
-  const [ email, setEmail ] = useState<string>('');
-  const [ phone, setPhone ] = useState<string>('');
-  const [ tin, setTin ] = useState<string>('');
-  const [ isPropertyOwner, setIsPropertyOwner ] = useState<boolean>(false);
-  const [ isVendor, setIsVendor ] = useState<boolean>(false);
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [tin, setTin] = useState<string>('');
+  const [isPropertyOwner, setIsPropertyOwner] = useState<boolean>(false);
+  const [isVendor, setIsVendor] = useState<boolean>(false);
   const [selectedBusinessTypes, setSelectedBusinessTypes] = useState<string[]>([]);
 
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -33,11 +37,22 @@ export default function Add() {
   };
 
   const addPayer = () => {
-    if (false) {
+    database.write(async () => {
+      await payersCollection.create((payer: Payer) => {
+        payer.firstName = firstName;
+        payer.lastName = lastName;
+        payer.email = email;
+        payer.phone = phone;
+        payer.tin = tin;
+        payer.propertyOwner = isPropertyOwner;
+        payer.vendor = isVendor;
+        payer.businessType = selectedBusinessTypes;
+      })
+    }).then(() => {
       setSuccessModalVisible(true);
-    } else {
+    }).catch(() => {
       setErrorModalVisible(true);
-    }
+    })
   }
 
   return (
@@ -45,62 +60,62 @@ export default function Add() {
       <Header text='Add Payer' />
 
       <View className='flex-1 p-4'>
-        <TextInput 
+        <TextInput
           label='First Name'
           placeholder='First Name'
           value={firstName}
-          onChangeText={(text) => {setFirstName(text)}}
-          onSubmitEditing={() => {}}
+          onChangeText={(text) => { setFirstName(text) }}
+          onSubmitEditing={() => { }}
           autoCapitalize='words'
           autoCorrect={false}
           keyboardType='default'
         />
 
-        <TextInput 
+        <TextInput
           label='Last Name'
           placeholder='Last Name'
           value={lastName}
-          onChangeText={(text => {setLastName(text)})}
-          onSubmitEditing={() => {}}
+          onChangeText={(text => { setLastName(text) })}
+          onSubmitEditing={() => { }}
           autoCapitalize='words'
           autoCorrect={false}
           keyboardType='default'
         />
 
-        <TextInput 
+        <TextInput
           label='Email'
           placeholder='Email'
           value={email}
-          onChangeText={(text => {setEmail(text)})}
-          onSubmitEditing={() => {}}
+          onChangeText={(text => { setEmail(text) })}
+          onSubmitEditing={() => { }}
           autoCapitalize='none'
           autoCorrect={false}
           keyboardType='email-address'
         />
 
-        <TextInput 
+        <TextInput
           label='Phone'
           placeholder='Phone'
           value={phone}
-          onChangeText={(text => {setPhone(text)})}
-          onSubmitEditing={() => {}}
+          onChangeText={(text => { setPhone(text) })}
+          onSubmitEditing={() => { }}
           autoCapitalize='none'
           autoCorrect={false}
           keyboardType='phone-pad'
         />
 
-        <TextInput 
+        <TextInput
           label='TIN'
           placeholder='TIN'
           value={tin}
-          onChangeText={(text => {setTin(text)})}
-          onSubmitEditing={() => {}}
+          onChangeText={(text => { setTin(text) })}
+          onSubmitEditing={() => { }}
           autoCapitalize='words'
           autoCorrect={false}
           keyboardType='default'
         />
 
-        <Select 
+        <Select
           options={businessTypeOptions}
           onChange={handleBusinessTypeChange}
         />
@@ -109,16 +124,16 @@ export default function Add() {
           Selected Business Types: {selectedBusinessTypes.join(', ')}
         </Text>
 
-        <Switch 
+        <Switch
           label='Property Owner'
           value={isPropertyOwner}
-          onValueChange={(value => {setIsPropertyOwner(value)})}
+          onValueChange={(value => { setIsPropertyOwner(value) })}
         />
 
-        <Switch 
+        <Switch
           label='Is Vendor'
           value={isVendor}
-          onValueChange={(value => {setIsVendor(value)})}
+          onValueChange={(value => { setIsVendor(value) })}
         />
 
         {/* Save button */}
@@ -127,24 +142,27 @@ export default function Add() {
         </TouchableOpacity>
 
         {/* Success Modal */}
-      <StatusModal
-        visible={successModalVisible}
-        type="success"
-        title="Payment Successful!"
-        message="Your payment has been processed successfully. Thank you for your purchase."
-        onClose={() => setSuccessModalVisible(false)}
-        autoCloseTime={5000} // Auto close after 5 seconds
-      />
-      
-      {/* Error Modal */}
-      <StatusModal
-        visible={errorModalVisible}
-        type="error"
-        title="Payment Failed"
-        message="We couldn't process your payment. Please check your payment details and try again."
-        onClose={() => setErrorModalVisible(false)}
-        autoCloseTime={0} // Don't auto close error modals
-      />
+        <StatusModal
+          visible={successModalVisible}
+          type="success"
+          title="Payer Added Successfully!"
+          message="The payer has been added successfully."
+          onClose={() => {
+            setSuccessModalVisible(false);
+            router.back();
+          }}
+          autoCloseTime={5000} // Auto close after 5 seconds
+        />
+
+        {/* Error Modal */}
+        <StatusModal
+          visible={errorModalVisible}
+          type="error"
+          title="Payment Failed"
+          message="We couldn't process your payment. Please check your payment details and try again."
+          onClose={() => setErrorModalVisible(false)}
+          autoCloseTime={0} // Don't auto close error modals
+        />
       </View>
     </View>
   )

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { payersCollection } from '~/db';
 
 // Mock data for vendors
 const MOCK_VENDORS = [
@@ -34,12 +35,21 @@ const VendorScreen = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   
   useEffect(() => {
-    // Simulate API fetch
-    setTimeout(() => {
-      setVendors(MOCK_VENDORS);
-      setFilteredVendors(MOCK_VENDORS);
+    payersCollection.query().fetch().then((result) => {
+      const fetchedPayers = [];
+      result.forEach((vendor) => {
+        fetchedPayers.push({
+          id: vendor.id,
+          name: vendor.firstName + ' ' + vendor.lastName,
+          phone: vendor.phone,
+          status: vendor.propertyOwner ? 'Active' : 'Inactive',
+          taxId: vendor.tin,
+          balance: 0,
+        })
+      })
+      setVendors(fetchedPayers);
       setLoading(false);
-    }, 1000);
+    })
   }, []);
 
   // Filter vendors based on search query and active filter
@@ -174,7 +184,7 @@ const VendorScreen = () => {
         ) : (
           <>
             <Text className="text-text mb-3">
-              {filteredVendors.length} {filteredVendors.length === 1 ? 'vendor' : 'vendors'} found
+              {filteredVendors.length} {filteredVendors.length === 1 ? 'payer' : 'payers'} found
             </Text>
             <FlatList
               data={filteredVendors}

@@ -23,4 +23,26 @@ export default class Payer extends Model {
   @children('payments') payments
   @children('properties') properties
   @children('invoices') invoices
+
+  get toObject() {
+    return {
+      id: this.id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      name: `${this.firstName} ${this.lastName}`,
+      companyName: this.companyName,
+      tin: this.tin,
+      phone: this.phone,
+      email: this.email,
+      vendor: this.vendor,
+      propertyOwner: this.propertyOwner,
+      businessType: this.businessType,
+      lastPaymentDate: this.lastPaymentDate,
+      notes: this.notes,
+      createdBy: this.createdBy,
+      lastModifiedBy: this.lastModifiedBy,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
+    }
+  }
 }
