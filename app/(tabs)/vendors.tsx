@@ -12,6 +12,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { payersCollection } from '~/db';
+import Payer from '~/db/model/Payer';
 
 // Mock data for vendors
 const MOCK_VENDORS = [
@@ -28,15 +29,15 @@ const MOCK_VENDORS = [
 ];
 
 const VendorScreen = () => {
-  const [vendors, setVendors] = useState([]);
+  const [vendors, setVendors] = useState<Payer[]>([]);
   const [filteredVendors, setFilteredVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   
   useEffect(() => {
-    payersCollection.query().fetch().then((result) => {
-      const fetchedPayers = [];
+    payersCollection.query().fetch().then((result: Payer[]) => {
+      const fetchedPayers: Payer[] = [];
       result.forEach((vendor) => {
         fetchedPayers.push({
           id: vendor.id,

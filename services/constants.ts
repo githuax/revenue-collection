@@ -44,5 +44,6 @@ const PAYMENT_METHODS = [
 ] as const;
 
 export {
-    STATES
+    STATES,
+    PAYMENT_METHODS
 }
