@@ -43,7 +43,21 @@ const PAYMENT_METHODS = [
     'Other'
 ] as const;
 
+const BUSINESS_TYPES = [
+    'Agricultural Produce',
+    'Electronics', 
+    'Entertainment', 
+    "Food & Beverage", 
+    'Manufacturing', 
+    'Media', 
+    'Retail', 
+    'Technology', 
+    'Transportation', 
+    'Other'
+]
+
 export {
     STATES,
-    PAYMENT_METHODS
+    PAYMENT_METHODS,
+    BUSINESS_TYPES
 }

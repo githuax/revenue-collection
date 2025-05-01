@@ -35,7 +35,7 @@ const LoginScreen = () => {
   const { user, login } = useAuthStore();
 
   if (user) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/(new_payments)/invoice" />;
   }
 
   useEffect(() => {

@@ -10,6 +10,7 @@ import StatusModal from '~/components/modals/Status'
 import database, { payersCollection } from '~/db'
 import Payer from '~/db/model/Payer'
 import { router } from 'expo-router'
+import { BUSINESS_TYPES } from '~/services/constants'
 
 export default function Add() {
   const [firstName, setFirstName] = useState<string>('');
@@ -24,12 +25,10 @@ export default function Add() {
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
 
-  const businessTypeOptions = [
-    { label: 'Retail', value: 'retail' },
-    { label: 'Wholesale', value: 'wholesale' },
-    { label: 'Service', value: 'service' },
-    { label: 'Manufacturing', value: 'manufacturing' },
-  ];
+  const businessTypeOptions = BUSINESS_TYPES.map((type) => ({
+    label: type,
+    value: type,
+  }));
 
   const handleBusinessTypeChange = (selectedValues: string[]) => {
     setSelectedBusinessTypes(selectedValues);

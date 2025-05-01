@@ -27,7 +27,7 @@ import DropdownComponent from '~/components/DropDown';
 import DatePicker from '~/components/DatePicker';
 
 
-const NewPaymentScreen = () => {
+const NewInvoiceScreen = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState(`PMT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
@@ -147,7 +147,7 @@ const NewPaymentScreen = () => {
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
       <Header
-        text="New Payment"
+        text="New Invoice"
       />
 
       <KeyboardAvoidingView
@@ -175,7 +175,7 @@ const NewPaymentScreen = () => {
 
           {/* Payment Details Section */}
           <View className="mb-6">
-            <Text className="text-text font-bold mb-2">Payment Details</Text>
+            <Text className="text-text font-bold mb-2">Invoice Details</Text>
 
             {/* Amount */}
             <View className="mb-4">
@@ -231,19 +231,6 @@ const NewPaymentScreen = () => {
               </View>
             </View>
 
-            {/* Payment Method */}
-            <View className='mb-4'>
-              <Text className="text-text/70 mb-1">Payment Method</Text>
-              <DropdownComponent
-                data={modifiedPaymentMethods}
-                placeholder="Select Payment Method"
-                isSearchable={false}
-                onChange={(item) => {
-                  setPaymentMethod(item.value);
-                }}
-              />
-            </View>
-
             {/* Description */}
             <View className="mb-4">
               <Text className="text-text/70 mb-1">Description (Optional)</Text>
@@ -257,30 +244,6 @@ const NewPaymentScreen = () => {
                 textAlignVertical="top"
               />
             </View>
-
-            {/* Location */}
-            <View>
-              <Text className="text-text/70 mb-1">Location</Text>
-              <TouchableOpacity
-                className="bg-white py-3 px-4 rounded-lg border border-gray-300 flex-row justify-between items-center"
-                onPress={getLocation}
-                disabled={locationLoading}
-              >
-                <Text className="text-text">
-                  {locationText}
-                </Text>
-                {locationLoading ? (
-                  <ActivityIndicator size="small" color="#2C3E50" />
-                ) : (
-                  <Feather name="map-pin" size={20} color="#2C3E50" />
-                )}
-              </TouchableOpacity>
-              {location && (
-                <Text className="text-text/70 text-sm mt-1">
-                  Lat: {location.latitude.toFixed(6)}, Long: {location.longitude.toFixed(6)}
-                </Text>
-              )}
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -291,11 +254,11 @@ const NewPaymentScreen = () => {
           className="bg-secondary py-4 rounded-lg items-center"
           onPress={handleSubmitPayment}
         >
-          <Text className="text-white font-bold text-lg">Record Payment</Text>
+          <Text className="text-white font-bold text-lg">Create Invoice</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
 
-export default NewPaymentScreen;
+export default NewInvoiceScreen;

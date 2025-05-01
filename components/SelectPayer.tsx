@@ -82,10 +82,9 @@ export default function SelectPayer({
             />
             </View>
             <TouchableOpacity
-                className="p-3"
+                className="flex-row items-center justify-center bg-primary/10 w-[12%] py-3 rounded-lg"
                 onPress={() => {
                     if (hasCameraPermission) {
-                        // setShowCamera(true);
                         router.push('/(new_payments)/camera')
                         setScanned(false);
                     } else {
