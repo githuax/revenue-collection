@@ -13,6 +13,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { payersCollection } from '~/db';
 import Payer from '~/db/model/Payer';
+import Header from '~/components/Header';
 
 // Mock data for vendors
 const MOCK_VENDORS = [
@@ -76,6 +77,9 @@ const VendorScreen = () => {
   const renderVendorItem = ({ item }) => (
     <TouchableOpacity 
       className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
+      onPress={() => {
+        router.push(`/(vendor)/${item.taxId}`)
+      }}
     >
       <View className="flex-row justify-between items-center">
         <View className="flex-1">
@@ -111,12 +115,10 @@ const VendorScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
-      
-      {/* Header */}
-      {/* <View className="bg-primary py-4 px-4">
-        <Text className="text-white text-xl font-bold">Vendors</Text>
-        <Text className="text-white/80 text-sm">Manage your vendor list</Text>
-      </View> */}
+      <Header 
+        text='Payers'
+        showBackButton={false}
+      />
       
       {/* Search Bar */}
       <View className="px-4 pt-4 pb-2">

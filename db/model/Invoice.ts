@@ -11,7 +11,6 @@ export default class Invoice extends Model {
   }
 
   @field('date') date
-  @field('payment_id') paymentId
   @field('amount_due') amountDue
   @field('due_date') dueDate
   @field('notes') notes
@@ -19,4 +18,5 @@ export default class Invoice extends Model {
 
   @relation('payers', 'payer_id') payer
   @relation('users', 'user_id') user
+  @relation('propertys', 'property_id') property
 }

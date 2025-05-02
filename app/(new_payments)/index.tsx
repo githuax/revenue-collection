@@ -25,12 +25,13 @@ import { PAYMENT_METHODS } from '~/services/constants';
 import Header from '~/components/Header';
 import DropdownComponent from '~/components/DropDown';
 import DatePicker from '~/components/DatePicker';
-
+import ReferenceNumber from '~/components/ReferenceNumber';
 
 const NewPaymentScreen = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
+  const [invoice, setInvoice] = useState(null);
   const [amount, setAmount] = useState('');
-  const [reference, setReference] = useState(`PMT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [reference, setReference] = useState('');
   const [date, setDate] = useState(new Date());
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [description, setDescription] = useState('');
@@ -43,20 +44,10 @@ const NewPaymentScreen = () => {
     value: method
   }))
 
-
-  // Generate reference number on mount
+  // Get current location on mount
   useEffect(() => {
     getLocation();
-    generateReference();
   }, []);
-
-  // Generate unique reference number
-  const generateReference = () => {
-    const prefix = 'PMT';
-    const year = new Date().getFullYear();
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    setReference(`${prefix}-${year}-${randomNum}`);
-  };
 
   // Get current location
   const getLocation = async () => {
@@ -192,20 +183,12 @@ const NewPaymentScreen = () => {
             {/* Reference Number */}
             <View className="mb-4">
               <Text className="text-text/70 mb-1">Reference Number</Text>
-              <View className="flex-row items-center justify-between">
-                <TextInput
-                  className="bg-gray-200 py-3 px-4 rounded-lg border border-gray-300 text-text w-[85%]"
-                  value={reference}
-                  onChangeText={setReference}
-                  editable={false}
-                />
-                <TouchableOpacity
-                  className="bg-primary/10 p-3 rounded-lg"
-                  onPress={generateReference}
-                >
-                  <Feather name="refresh-cw" size={20} color="#2C3E50" />
-                </TouchableOpacity>
-              </View>
+              <ReferenceNumber
+                prefix="PMT"
+                value={reference}
+                onChange={setReference}
+                editable={false}
+              />
             </View>
 
             {/* Date */}

@@ -6,12 +6,13 @@ import { router } from 'expo-router';
 
 type HeaderProps = {
     text: string;
+    showBackButton?: boolean;
 }
 
-export default function Header({ text }: HeaderProps) {
+export default function Header({ text, showBackButton = true }: HeaderProps) {
     return (
         <View className='flex-row items-center p-4 bg-background'>
-            {router.canGoBack() && <TouchableOpacity onPress={() => {
+            {(router.canGoBack() && showBackButton) && <TouchableOpacity onPress={() => {
                 router.back();
             }}>
                 <Ionicons name="chevron-back" size={24} color="black" className='mr-3' />
