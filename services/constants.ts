@@ -56,8 +56,15 @@ const BUSINESS_TYPES = [
     'Other'
 ]
 
+const INVOICE_STATUS = {
+    PAID: 'paid',
+    UNPAID: 'unpaid',
+    PARTIALLY_PAID: 'partially_paid'
+}
+
 export {
     STATES,
     PAYMENT_METHODS,
-    BUSINESS_TYPES
+    BUSINESS_TYPES,
+    INVOICE_STATUS
 }
