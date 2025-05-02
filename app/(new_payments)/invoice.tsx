@@ -24,6 +24,8 @@ import DatePicker from '~/components/DatePicker';
 import Invoice from '~/db/model/Invoice';
 import { INVOICE_STATUS } from '~/services/constants';
 import StatusModal from '~/components/modals/Status';
+import { relation } from '@nozbe/watermelondb/decorators';
+import useAuthStore from '~/store/authStore';
 
 const NewInvoiceScreen = () => {
     const [selectedVendor, setSelectedVendor] = useState(null);
@@ -61,16 +63,18 @@ const NewInvoiceScreen = () => {
         }
 
         database.write(async () => {
-            invoicesCollection.create((invoice: Invoice) => {
-                invoice.payer = selectVendor;
+            await invoicesCollection.create((invoice: Invoice) => {
+                invoice.payerId = selectedVendor.value;
+                invoice.createdBy = useAuthStore.getState().userData?.id || '';
                 invoice.date = Date.now();
-                invoice.amountDue = amount;
+                invoice.amountDue = parseFloat(amount);
                 invoice.dueDate = date;
                 invoice.status = INVOICE_STATUS.UNPAID;
             })
         }).then(() => {
             setSuccessModalVisible(true);
         }).catch((error) => {
+            console.log(error)
             setErrorModalVisible(true);
         })
     };

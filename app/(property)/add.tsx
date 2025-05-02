@@ -40,7 +40,7 @@ export default function Add() {
           property.type = propertyData.type
           property.notes = propertyData.notes
           property.images = propertyData.images
-          property.owner.set(owner[0].id)
+          property.ownerId = propertyData.payer.id
         })
       })
       router.back()

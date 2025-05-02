@@ -15,6 +15,7 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import database from '~/db';
+import Header from '~/components/Header';
 
 // Mock data for payments
 const MOCK_PAYMENTS = [
@@ -364,11 +365,10 @@ const PaymentRecordScreen = () => {
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
       
-      {/* Header
-      <View className="bg-primary py-4 px-4">
-        <Text className="text-white text-xl font-bold">Payment Records</Text>
-        <Text className="text-white/80 text-sm">Track and manage tax payments</Text>
-      </View> */}
+      <Header 
+        text='Payments'
+        showBackButton={false}
+      />
       
       {/* Search Bar */}
       <View className="px-4 pt-4 pb-2">

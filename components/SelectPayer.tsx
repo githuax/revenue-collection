@@ -5,37 +5,21 @@ import DropdownComponent from './DropDown'
 import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useCameraPermissions } from 'expo-camera';
-
-// Mock data for vendors
-const MOCK_VENDORS = [
-    { id: '1', name: 'TechSolutions Inc.', tpin: 'TP12345', phoneNumber: '555-123-4567', address: '123 Tech Blvd, Silicon Valley' },
-    { id: '2', name: 'Green Grocery Ltd', tpin: 'TP23456', phoneNumber: '555-234-5678', address: '456 Green St, Farmville' },
-    { id: '3', name: 'Fitness First', tpin: 'TP34567', phoneNumber: '555-345-6789', address: '789 Fitness Ave, Gymtown' },
-    { id: '4', name: 'Books & Beyond', tpin: 'TP45678', phoneNumber: '555-456-7890', address: '101 Reader Lane, Bookville' },
-    { id: '5', name: 'Office Supplies Co.', tpin: 'TP56789', phoneNumber: '555-567-8901', address: '234 Office Park, Stationery City' },
-];
-
-const TRANSFORMED_MOCK_VENDORS = MOCK_VENDORS.map(vendor => ({
-    id: vendor.id,
-    label: vendor.name,
-    name: vendor.name,
-    value: vendor.id,
-    tpin: vendor.tpin,
-    phoneNumber: vendor.phoneNumber,
-    address: vendor.address,
-}));
+import { getAllPayers } from '~/services/dbService';
 
 export default function SelectPayer({
     onVendorSelect
 }) {
     const [selectedVendor, setSelectedVendor] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState(TRANSFORMED_MOCK_VENDORS);
+    const [searchResults, setSearchResults] = useState([]);
 
     const [scanned, setScanned] = useState(false);
 
     const [permission, requestPermission] = useCameraPermissions();
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
+
+    const [payers, setPayers] = useState([]);
 
      // Request camera permissions
       useEffect(() => {
@@ -43,6 +27,21 @@ export default function SelectPayer({
           const { status } = await requestPermission();
           setHasCameraPermission(status === 'granted');
         })();
+
+        getAllPayers().then((payers) => {
+            const transformedPayers = payers.map(payer => ({
+                id: payer.id,
+                label: payer.firstName + ' ' + payer.lastName,
+                name: payer.firstName + ' ' + payer.lastName,
+                value: payer.id,
+                tpin: payer.tin,
+                phoneNumber: payer.phone,
+                email: payer.email,
+            }));
+
+            setPayers(transformedPayers);
+            setSearchResults(transformedPayers);
+        })
       }, []);
 
 
@@ -75,7 +74,7 @@ export default function SelectPayer({
         <View className="flex-row items-center justify-between">
             <View className='w-[85%]'>
             <DropdownComponent
-                data={TRANSFORMED_MOCK_VENDORS}
+                data={payers}
                 placeholder="Select Payer"
                 searchPlaceholder="Search by name, TPIN or phone number"
                 onChange={selectVendor}

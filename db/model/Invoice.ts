@@ -5,18 +5,12 @@ import { Associations } from '@nozbe/watermelondb/Model'
 export default class Invoice extends Model {
   static table = 'invoices'
 
-  static associations : Associations = {
-    payers: { type: 'belongs_to', key: 'payer_id' },
-    users: { type: 'belongs_to', key: 'user_id' }
-  }
-
   @field('date') date
   @field('amount_due') amountDue
   @field('due_date') dueDate
   @field('notes') notes
   @field('status') status
-
-  @relation('payers', 'payer_id') payer
-  @relation('users', 'user_id') user
-  @relation('propertys', 'property_id') property
+  @field('created_by') createdBy
+  @field('payer_id') payerId
+  @field('property_id') propertyId
 }

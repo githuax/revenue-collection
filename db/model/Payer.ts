@@ -17,12 +17,8 @@ export default class Payer extends Model {
   @field('notes') notes
   @field('created_by') createdBy
   @field('last_modified_by') lastModifiedBy
-  @readonly @date('created_datetime') createdAt
-  @readonly @date('last_modified_date') updatedAt
-
-  @children('payments') payments
-  @children('properties') properties
-  @children('invoices') invoices
+  @date('created_datetime') createdAt
+  @date('last_modified_date') updatedAt
 
   get toObject() {
     return {

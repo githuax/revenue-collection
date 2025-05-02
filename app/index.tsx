@@ -34,19 +34,13 @@ const LoginScreen = () => {
 
   const { user, login } = useAuthStore();
 
-  if (user) {
-    return <Redirect href="/(tabs)" />;
-  }
-
-  useEffect(() => {
-    if (user) {
-      router.push('/(tabs)');
-    }
-  }, [user]);
-
   const handleLogin = () => {
     login(email, password)
   };
+
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

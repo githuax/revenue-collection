@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
+import Header from '~/components/Header';
+import { getDashboardStats, getFeedPayments } from '~/services/dbService';
+import useAuthStore from '~/store/authStore';
 
 // Mock data for demonstration
 const MOCK_TASKS = [
@@ -84,6 +87,26 @@ const Home = () => {
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'pending', 'complete'
   const [filterPriority, setFilterPriority] = useState('all'); // 'all', 'high', 'medium', 'low'
   const [searchQuery, setSearchQuery] = useState('');
+
+  const [stats, setStats] = useState({
+    pendingCount: 0,
+    completedCount: 0,
+    totalAmount: 0,
+  });
+
+  useEffect(() => {
+    getFeedPayments().then(data => {
+      // console.log('Data', data)
+    });
+
+    getDashboardStats().then(data => {
+      setStats({
+        pendingCount: data.pendingPayments,
+        completedCount: data.completedPayments,
+        totalAmount: data.amountToCollect,
+      });
+    })
+  }, [])
 
   const filteredTasks = tasks.filter(task => {
     // Apply status filter
@@ -175,29 +198,27 @@ const Home = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
       
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Payments</Text>
-        <TouchableOpacity style={styles.addButton}>
-          <Text style={styles.addButtonText}>+ New Payment</Text>
-        </TouchableOpacity>
-      </View>
+      <Header 
+        text={`Hello ${useAuthStore.getState().userData?.first_name} ${useAuthStore.getState().userData?.last_name}`}
+        showBackButton={false}
+      />
 
       {/* Task Statistics */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{tasks.filter(t => t.status === 'pending').length}</Text>
+          <Text style={styles.statValue}>{stats.pendingCount}</Text>
           <Text style={styles.statLabel}>Pending</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={styles.statValue}>
-            ${tasks.filter(t => t.status === 'pending').reduce((sum, t) => sum + t.amount, 0).toLocaleString()}
+            ${stats.totalAmount.toLocaleString()}
           </Text>
           <Text style={styles.statLabel}>To Collect</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{tasks.filter(t => t.status === 'complete').length}</Text>
+          <Text style={styles.statValue}>{stats.completedCount}</Text>
           <Text style={styles.statLabel}>Completed</Text>
         </View>
       </View>

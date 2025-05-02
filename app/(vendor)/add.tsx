@@ -11,6 +11,7 @@ import database, { payersCollection } from '~/db'
 import Payer from '~/db/model/Payer'
 import { router } from 'expo-router'
 import { BUSINESS_TYPES } from '~/services/constants'
+import useAuthStore from '~/store/authStore'
 
 export default function Add() {
   const [firstName, setFirstName] = useState<string>('');
@@ -46,10 +47,12 @@ export default function Add() {
         payer.propertyOwner = isPropertyOwner;
         payer.vendor = isVendor;
         payer.businessType = selectedBusinessTypes;
+        payer.createdBy = useAuthStore.getState().userData?.id;
       })
     }).then(() => {
       setSuccessModalVisible(true);
-    }).catch(() => {
+    }).catch((error) => {
+      console.log(error)
       setErrorModalVisible(true);
     })
   }
@@ -114,14 +117,11 @@ export default function Add() {
           keyboardType='default'
         />
 
+        <Text className='text-gray-700 font-semibold mb-2'>Business Type</Text>
         <Select
           options={businessTypeOptions}
           onChange={handleBusinessTypeChange}
         />
-
-        <Text style={{ marginTop: 8 }}>
-          Selected Business Types: {selectedBusinessTypes.join(', ')}
-        </Text>
 
         <Switch
           label='Property Owner'

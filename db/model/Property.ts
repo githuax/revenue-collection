@@ -5,10 +5,6 @@ import { Associations } from '@nozbe/watermelondb/Model'
 export default class Property extends Model {
   static table = 'properties'
 
-  static associations: Associations = {
-    payers: { type: 'belongs_to', key: 'owner_id' }
-  }
-
   @field('property_ref_no') propertyRefNo
   @field('address') address
   @field('geolocation') geolocation
@@ -17,6 +13,5 @@ export default class Property extends Model {
   @field('type') type
   @field('notes') notes
   @field('images') images
-
-  @relation('payers', 'owner_id') owner
+  @field('owner_id') ownerId
 }

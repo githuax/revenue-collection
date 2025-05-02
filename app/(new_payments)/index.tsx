@@ -26,6 +26,7 @@ import Header from '~/components/Header';
 import DropdownComponent from '~/components/DropDown';
 import DatePicker from '~/components/DatePicker';
 import ReferenceNumber from '~/components/ReferenceNumber';
+import SelectInvoice from '~/components/SelectInvoice';
 
 const NewPaymentScreen = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -162,6 +163,15 @@ const NewPaymentScreen = () => {
                 <Text className="text-text/70">{selectedVendor.phoneNumber}</Text>
               </View>
             )}
+          </View>
+
+          {/* Invoice */}
+          <View className="mb-6">
+            <Text className="text-text font-bold mb-2">Payer</Text>
+            <SelectInvoice
+              onInvoiceSelect={() => {}}
+              payerId={selectedVendor ? selectedVendor.id : undefined}
+            />
           </View>
 
           {/* Payment Details Section */}

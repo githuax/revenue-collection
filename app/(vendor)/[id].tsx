@@ -115,10 +115,6 @@ export default function PayerDetails() {
                     />
                     {MOCK_PROPERTIES.map((property) => (
                         <>
-                            {/* <View key={property.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-                            <Text className='text-text font-semibold'>{property.name}</Text>
-                            <Text className='text-text/70 mt-1'>Address: {property.address}</Text>
-                        </View> */}
                             <PropertyCard
                                 key={property.id}
                                 property={{
