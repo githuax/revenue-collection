@@ -10,6 +10,7 @@ type TextInputProps = {
     secureTextEntry?: boolean;
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
     autoCorrect?: boolean;
+    icon?: React.ReactNode;
     keyboardType?: 
         | 'default'
         | 'email-address'
@@ -37,6 +38,7 @@ export default function TextInput({
     value,
     onChangeText,
     onSubmitEditing,
+    icon,
     secureTextEntry = false,
     autoCapitalize = 'none',
     autoCorrect = false,
@@ -46,19 +48,20 @@ export default function TextInput({
   return (
     <>
         {label && <Text className='text-gray-700 font-semibold mb-2'>{label}</Text>}
-        <RNTextInput 
-            className='border border-gray-300 rounded-lg p-2 mb-4'
-            placeholder={placeholder}
-            value={value}
-            onChangeText={onChangeText}
-            onSubmitEditing={onSubmitEditing}
-            secureTextEntry={secureTextEntry}
-            autoCapitalize={autoCapitalize}
-            autoCorrect={autoCorrect}
-            keyboardType={keyboardType}
-            returnKeyType={returnKeyType}
-            style={{ height: 40, padding: 10 }}
-        />
+        <View className='flex-row items-center border border-gray-200 rounded-xl bg-white px-4 h-12'>
+            {icon && <View className='mr-2'>{icon}</View>}
+            <RNTextInput 
+                placeholder={placeholder}
+                value={value}
+                onChangeText={onChangeText}
+                onSubmitEditing={onSubmitEditing}
+                secureTextEntry={secureTextEntry}
+                autoCapitalize={autoCapitalize}
+                autoCorrect={autoCorrect}
+                keyboardType={keyboardType}
+                returnKeyType={returnKeyType}
+            />
+        </View>
     </>
   )
 }

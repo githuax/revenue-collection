@@ -51,44 +51,51 @@ export default function Add() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
+      {/* Enhanced Header with Shadow */}
       <Header
         text='Add Property'
+        className="border-b border-gray-200 shadow-sm"
       />
+
       <ScrollView className="flex-1">
-        <View className="px-6 mb-4">
+        <View className="px-6 pb-4">
+          {/* Title Section */}
+          <View className="mb-6">
+            <Text className="text-gray-500 mt-1">Please fill in the information below</Text>
+          </View>
 
-
-          {/* Form Container */}
-          <View className="space-y-6 mb-4">
+          {/* Form Container - Added Card Style */}
+          <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
             {/* Property Reference */}
-            <View className='mb-4'>
-              <Text className="text-gray-700 font-medium mb-2">Property Reference Number</Text>
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Property Reference</Text>
               <ReferenceNumber
                 prefix="PROP"
                 value={propertyData.property_ref_no}
                 onChange={(text) => setPropertyData({ ...propertyData, property_ref_no: text })}
                 editable={false}
+                className="bg-gray-100" // Added background color
               />
             </View>
 
-            {/* Payer to whom the property belong */}
-            <View className='mb-4'>
-              <Text className='text-primary mb-2'>Belongs to</Text>
-              <SelectPayer 
+            {/* Payer to whom the property belong - Highlighted Section */}
+            <View className="mb-5 bg-blue-50 p-4 rounded-xl">
+              <Text className="text-blue-700 font-semibold mb-2 text-base">Belongs to</Text>
+              <SelectPayer
                 onVendorSelect={(vendor) => {
                   setPropertyData({
                     ...propertyData, payer: vendor
                   })
                 }}
+                className="bg-white rounded-lg" // Added styling for the selector
               />
             </View>
 
             {/* Address */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Address</Text>
-              <View className="flex-row items-start border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="location-outline" size={20} color="#6B7280" className="mt-3" />
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Address</Text>
+              <View className="flex-row items-start border border-gray-200 rounded-xl bg-white px-4 mb-1">
+                <Ionicons name="location-outline" size={20} color="#4B5563" className="mt-3" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.address}
@@ -96,72 +103,88 @@ export default function Add() {
                   placeholder="Enter property address"
                   multiline
                   numberOfLines={2}
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
+              <Text className="text-xs text-gray-500 ml-1">Full address including street, city and postal code</Text>
             </View>
 
             {/* Geolocation */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Geolocation</Text>
-              <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="map-outline" size={20} color="#6B7280" />
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Geolocation</Text>
+              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="map-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.geolocation}
                   onChangeText={(text) => setPropertyData({ ...propertyData, geolocation: text })}
                   placeholder="Enter geolocation coordinates"
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
+          </View>
+
+          {/* Financial Details Section - Separate Card */}
+          <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+            <Text className="text-xl font-bold text-gray-800 mb-4">Financial Information</Text>
 
             {/* Assessment Payment */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Assessment Payment</Text>
-              <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="cash-outline" size={20} color="#6B7280" />
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Assessment Payment</Text>
+              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="cash-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.assess_payment}
                   onChangeText={(text) => setPropertyData({ ...propertyData, assess_payment: text })}
                   placeholder="Enter assessment payment amount"
                   keyboardType="numeric"
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
 
             {/* Payment Expiry Date */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Payment Expiry Date</Text>
-              <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="calendar-outline" size={20} color="#6B7280" />
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Payment Expiry Date</Text>
+              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="calendar-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.payment_expiry_date}
                   onChangeText={(text) => setPropertyData({ ...propertyData, payment_expiry_date: text })}
                   placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
+          </View>
 
-            {/* Property Type */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Property Type</Text>
-              <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="business-outline" size={20} color="#6B7280" />
+          {/* Property Details Section - Separate Card */}
+          <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+            <Text className="text-xl font-bold text-gray-800 mb-4">Property Specifications</Text>
+
+            {/* Property Type with Radio Options */}
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Property Type</Text>
+              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="business-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.type}
                   onChangeText={(text) => setPropertyData({ ...propertyData, type: text })}
                   placeholder="e.g., Residential, Commercial"
+                  placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
 
             {/* Notes */}
-            <View>
-              <Text className="text-gray-700 font-medium mb-2">Notes</Text>
-              <View className="flex-row items-start border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="document-text-outline" size={20} color="#6B7280" className="mt-3" />
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Notes</Text>
+              <View className="flex-row items-start border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="document-text-outline" size={20} color="#4B5563" className="mt-3" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.notes}
@@ -169,37 +192,34 @@ export default function Add() {
                   placeholder="Enter property notes"
                   multiline
                   numberOfLines={4}
+                  placeholderTextColor="#9CA3AF"
+                  textAlignVertical="top"
                 />
               </View>
             </View>
 
             {/* Images */}
             <View>
-              <Text className="text-gray-700 font-medium mb-2">Images (URLs)</Text>
-              <View className="flex-row items-start border border-gray-200 rounded-xl bg-gray-50 px-4 mb-4">
-                <Ionicons name="images-outline" size={20} color="#6B7280" className="mt-3" />
-                <TextInput
-                  className="flex-1 py-3 px-3 text-gray-700"
-                  value={propertyData.images}
-                  onChangeText={(text) => setPropertyData({ ...propertyData, images: text })}
-                  placeholder="Enter image URLs (comma-separated)"
-                  multiline
-                  readOnly
-                />
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Images</Text>
+              <View className="p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mb-4 items-center justify-center">
+                <Ionicons name="images-outline" size={40} color="#6B7280" />
+                <Text className="text-gray-500 mt-2 text-center">No images selected</Text>
+                <TouchableOpacity className="mt-3 bg-gray-200 rounded-lg px-4 py-2">
+                  <Text className="text-gray-700 font-medium">Select Images</Text>
+                </TouchableOpacity>
               </View>
             </View>
-
-            {/* Submit Button */}
-            <TouchableOpacity
-              className="bg-blue-600 rounded-xl p-4 mt-8 shadow-sm mb-4"
-              onPress={handleSubmit}
-            >
-              <View className="flex-row items-center justify-center space-x-2">
-                <Ionicons name="add-circle-outline" size={24} color="white" />
-                <Text className="text-white text-center font-semibold text-lg">Add Property</Text>
-              </View>
-            </TouchableOpacity>
           </View>
+
+          {/* Submit Button - Enhanced */}
+          <TouchableOpacity
+            className="bg-blue-600 rounded-xl p-4 mb-8 shadow-md"
+            onPress={handleSubmit}
+          >
+            <View className="flex-row items-center justify-center space-x-2">
+              <Text className="text-white text-center font-bold text-lg">Add Property</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
