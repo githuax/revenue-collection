@@ -72,11 +72,42 @@ export default function PayerDetails() {
     const localParams = useLocalSearchParams();
 
     const [payerDetails, setPayerDetails] = useState<Payer>(undefined);
+    const [properties, setProperties] = useState([]);
+    const [invoices, setInvoices] = useState([]);
+    const [payments, setPayments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         getPayerByTIN(localParams?.id).then((data) => {
-            setPayerDetails(data);
+            setPayerDetails(data.data);
+
+            const updatedInvoice = data.invoices.map((invoice) => {
+                const dueDate = new Date(invoice._raw.due_date).toLocaleDateString();
+
+                return {
+                    amountDue: invoice._raw.amount_due,
+                    ref_no: invoice._raw.ref_no,
+                    status: invoice._raw.status,
+                    due_date: dueDate
+                }
+            })
+
+            const updatedPayments = data.payments.map((payment) => {
+                const createdDate = new Date(payment._raw.created_date).toLocaleDateString();
+
+                return {
+                    id: payment._raw.id,
+                    amount: payment._raw.amount,
+                    status: payment._raw.status,
+                    created_date: createdDate
+                }
+            })
+
+            setProperties(data.properties);
+            setInvoices(updatedInvoice);
+            setPayments(updatedPayments);
+
+
             setIsLoading(false);
         })
     }, [])
@@ -122,8 +153,7 @@ export default function PayerDetails() {
                                     title: property.name,
                                     type: property.type,
                                     expiryDate: property.expiryDate,
-                                    amount: property.amount,
-                                    priority: property.priority
+                                    amount: property.amount
                                 }}
                                 onPress={() => { }}
                             />
@@ -140,11 +170,11 @@ export default function PayerDetails() {
                             router.push('/(new_payments)/invoice')
                          }}
                     />
-                    {MOCK_INVOICES.map((invoice) => (
+                    {invoices.map((invoice) => (
                         <View key={invoice.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-                            <Text className='text-text font-semibold'>Invoice ID: {invoice.id}</Text>
-                            <Text className='text-text/70 mt-1'>Amount: ${invoice.amount}</Text>
-                            <Text className='text-text/70 mt-1'>Date: {invoice.date}</Text>
+                            <Text className='text-text font-semibold'>Invoice ID: {invoice.ref_no}</Text>
+                            <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
+                            <Text className='text-text/70 mt-1'>Date: {invoice.due_date}</Text>
                             <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
                         </View>
                     ))}
@@ -160,11 +190,11 @@ export default function PayerDetails() {
                             router.push('/(new_payments)')
                          }}
                     />
-                    {MOCK_PAYMENTS.map((payment) => (
+                    {payments.map((payment) => (
                         <View key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
                             <Text className='text-text font-semibold'>Payment ID: {payment.id}</Text>
                             <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
-                            <Text className='text-text/70 mt-1'>Date: {payment.date}</Text>
+                            <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
                             <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
                         </View>
                     ))}

@@ -15,7 +15,6 @@ export default function SelectInvoice({
     const [payers, setPayers] = useState([]);
 
     useEffect(() => {
-        console.log(payerId)
         if(payerId) {
             getPayerInvoices(payerId).then(data => {
                 const transformedInvoices = data.map(invoice => ({

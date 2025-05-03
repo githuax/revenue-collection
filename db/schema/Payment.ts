@@ -13,6 +13,7 @@ export const PaymentSchema = tableSchema({
       { name: 'notes', type: 'string' },
       { name: 'created_by', type: 'string' },
       { name: 'created_date', type: 'number' },
+      { name: 'ref_no', type: 'string' }
     ],
   })
   

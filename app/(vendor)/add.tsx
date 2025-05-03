@@ -33,7 +33,6 @@ export default function Add() {
 
   const handleBusinessTypeChange = (selectedValues: string[]) => {
     setSelectedBusinessTypes(selectedValues);
-    console.log('Selected Business Types:', selectedValues);
   };
 
   const addPayer = () => {

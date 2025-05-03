@@ -110,9 +110,9 @@ const NewPaymentScreen = () => {
         payment.createdBy = useAuthStore.getState().userData?.id || '';
         payment.createdDate = new Date();
         payment.notes = description;
+        payment.ref_no = reference;
       })
     }).then(() => {
-      console.log('Payment saved successfully');
 
       // Show success message
       Alert.alert(

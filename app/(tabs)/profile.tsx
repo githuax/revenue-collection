@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
@@ -41,20 +42,6 @@ const Profile = () => {
 
   const { user: storeUser, userData, logout } = useAuthStore();
   
-  const [addingPayer, setAddingPayer] = useState(false);
-  const [addingProperty, setAddingProperty] = useState(false);
-  const [newPayer, setNewPayer] = useState({
-    name: '',
-    type: 'Business', // 'Business' or 'Individual'
-    identifier: '',
-    contactName: '',
-    email: '',
-    phone: '',
-    address: '',
-    taxCategory: '',
-    notes: '',
-  });
-  
   // For demonstration purposes - in a real app this would come from an API
   const [recentPayers, setRecentPayers] = useState([
     {
@@ -85,38 +72,6 @@ const Profile = () => {
     setUser(tempUser);
     setEditingUser(false);
     Alert.alert('Success', 'Your profile has been updated successfully.');
-  };
-
-  const handleAddPayer = () => {
-    // Validate input fields
-    if (!newPayer.name || !newPayer.identifier) {
-      Alert.alert('Missing Information', 'Please provide at least the payer name and identifier.');
-      return;
-    }
-
-    // In a real app, this would call an API to create the payer
-    const payerId = `P-${Math.floor(1000 + Math.random() * 9000)}`;
-    const createdPayer = {
-      id: payerId,
-      ...newPayer,
-      registeredDate: new Date().toISOString().split('T')[0],
-    };
-    
-    setRecentPayers([createdPayer, ...recentPayers]);
-    setAddingPayer(false);
-    setNewPayer({
-      name: '',
-      type: 'Business',
-      identifier: '',
-      contactName: '',
-      email: '',
-      phone: '',
-      address: '',
-      taxCategory: '',
-      notes: '',
-    });
-    
-    Alert.alert('Success', `Payer "${newPayer.name}" has been registered successfully with ID: ${payerId}`);
   };
 
   const renderSectionHeader = (title) => (
@@ -169,99 +124,6 @@ const Profile = () => {
             </View>
           </View>
         </View>
-        
-        {/* Notification Preferences */}
-        {/* {renderSectionHeader('Notification Preferences')}
-        <View style={styles.cardContainer}>
-          <View style={styles.preferenceRow}>
-            <Text style={styles.preferenceLabel}>Email Notifications</Text>
-            <Switch
-              trackColor={{ false: "#E1E8ED", true: "#4CAF50" }}
-              thumbColor="#FFFFFF"
-              value={user.notificationPreferences.email}
-              onValueChange={(value) => setUser({
-                ...user,
-                notificationPreferences: {
-                  ...user.notificationPreferences,
-                  email: value
-                }
-              })}
-            />
-          </View>
-          <View style={styles.preferenceRow}>
-            <Text style={styles.preferenceLabel}>Push Notifications</Text>
-            <Switch
-              trackColor={{ false: "#E1E8ED", true: "#4CAF50" }}
-              thumbColor="#FFFFFF"
-              value={user.notificationPreferences.push}
-              onValueChange={(value) => setUser({
-                ...user,
-                notificationPreferences: {
-                  ...user.notificationPreferences,
-                  push: value
-                }
-              })}
-            />
-          </View>
-          <View style={styles.preferenceRow}>
-            <Text style={styles.preferenceLabel}>SMS Notifications</Text>
-            <Switch
-              trackColor={{ false: "#E1E8ED", true: "#4CAF50" }}
-              thumbColor="#FFFFFF"
-              value={user.notificationPreferences.sms}
-              onValueChange={(value) => setUser({
-                ...user,
-                notificationPreferences: {
-                  ...user.notificationPreferences,
-                  sms: value
-                }
-              })}
-            />
-          </View>
-        </View> */}
-        
-        {/* Manage Payers Section */}
-        {renderSectionHeader('Payer Management')}
-        <View style={styles.cardContainer}>
-          <TouchableOpacity 
-            style={styles.addPayerButton}
-            onPress={() => setAddingPayer(true)}
-          >
-            <Text style={styles.addPayerButtonText}>+ Register New Payer</Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.recentPayersTitle}>Recently Registered Payers</Text>
-          
-          {recentPayers.map((payer) => (
-            <View key={payer.id} style={styles.payerItem}>
-              <View style={styles.payerHeader}>
-                <Text style={styles.payerName}>{payer.name}</Text>
-                <Text style={[
-                  styles.payerType, 
-                  payer.type === 'Business' ? styles.businessType : styles.individualType
-                ]}>
-                  {payer.type}
-                </Text>
-              </View>
-              
-              <View style={styles.payerDetails}>
-                <Text style={styles.payerId}>ID: {payer.identifier}</Text>
-                <Text style={styles.payerDate}>Registered: {payer.registeredDate}</Text>
-              </View>
-              
-              <TouchableOpacity style={styles.viewPayerButton}>
-                <Text style={styles.viewPayerText}>View Details</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
-        <RegistrationSection 
-          title='Property Management'
-          recentPayers={recentPayers}
-          addButtonText='Register New Property'
-          setIsVisible={setAddingProperty}
-        />
         
         {/* Other Settings */}
         {renderSectionHeader('App Settings')}
@@ -384,164 +246,6 @@ const Profile = () => {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      
-      {/* Add Payer Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={addingPayer}
-        onRequestClose={() => setAddingPayer(false)}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalContainer}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Register New Payer</Text>
-              <TouchableOpacity onPress={() => setAddingPayer(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalScrollView}>
-              <View style={styles.payerTypeSelector}>
-                <TouchableOpacity
-                  style={[
-                    styles.payerTypeOption,
-                    newPayer.type === 'Business' && styles.payerTypeSelected
-                  ]}
-                  onPress={() => setNewPayer({...newPayer, type: 'Business'})}
-                >
-                  <Text style={[
-                    styles.payerTypeText,
-                    newPayer.type === 'Business' && styles.payerTypeTextSelected
-                  ]}>Business</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.payerTypeOption,
-                    newPayer.type === 'Individual' && styles.payerTypeSelected
-                  ]}
-                  onPress={() => setNewPayer({...newPayer, type: 'Individual'})}
-                >
-                  <Text style={[
-                    styles.payerTypeText,
-                    newPayer.type === 'Individual' && styles.payerTypeTextSelected
-                  ]}>Individual</Text>
-                </TouchableOpacity>
-              </View>
-            
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>
-                  {newPayer.type === 'Business' ? 'Business Name' : 'Full Name'} *
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.name}
-                  onChangeText={(text) => setNewPayer({...newPayer, name: text})}
-                  placeholder={newPayer.type === 'Business' ? 'Enter business name' : 'Enter full name'}
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>
-                  {newPayer.type === 'Business' ? 'Business ID / Tax ID' : 'SSN / Tax ID'} *
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.identifier}
-                  onChangeText={(text) => setNewPayer({...newPayer, identifier: text})}
-                  placeholder="Enter tax identifier"
-                />
-              </View>
-              
-              {newPayer.type === 'Business' && (
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Contact Person</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newPayer.contactName}
-                    onChangeText={(text) => setNewPayer({...newPayer, contactName: text})}
-                    placeholder="Enter contact person's name"
-                  />
-                </View>
-              )}
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.email}
-                  onChangeText={(text) => setNewPayer({...newPayer, email: text})}
-                  placeholder="Enter email address"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Phone Number</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.phone}
-                  onChangeText={(text) => setNewPayer({...newPayer, phone: text})}
-                  placeholder="Enter phone number"
-                  keyboardType="phone-pad"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Address</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.address}
-                  onChangeText={(text) => setNewPayer({...newPayer, address: text})}
-                  placeholder="Enter complete address"
-                  multiline={true}
-                  numberOfLines={3}
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Tax Category</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPayer.taxCategory}
-                  onChangeText={(text) => setNewPayer({...newPayer, taxCategory: text})}
-                  placeholder="e.g., Property, Sales, Income"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Notes</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={newPayer.notes}
-                  onChangeText={(text) => setNewPayer({...newPayer, notes: text})}
-                  placeholder="Enter any additional information"
-                  multiline={true}
-                  numberOfLines={4}
-                />
-              </View>
-              
-              <Text style={styles.requiredFieldsNote}>* Required fields</Text>
-              
-              <TouchableOpacity 
-                style={styles.saveButton}
-                onPress={handleAddPayer}
-              >
-                <Text style={styles.saveButtonText}>Register Payer</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      <RegisterNewPropertyModal 
-        visible={addingProperty}
-        setIsVisible={setAddingProperty}
-      />
     </SafeAreaView>
   );
 };

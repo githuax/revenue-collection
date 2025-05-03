@@ -2,7 +2,8 @@ import { Q } from "@nozbe/watermelondb";
 import database, {
     invoicesCollection,
     payersCollection,
-    paymentsCollection
+    paymentsCollection,
+    propertiesCollection
 } from "~/db"
 
 import useAuthStore from "~/store/authStore";
@@ -12,7 +13,23 @@ const getPayerByTIN = async (tin) => {
     const data = await payersCollection.query(
         Q.where('tin', tin),
     ).fetch();
-    return data[0];
+
+    const properties = await propertiesCollection.query(
+        Q.where('owner_id', data[0]._raw.id)
+    ).fetch();
+    const invoices = await invoicesCollection.query(
+        Q.where('payer_id', data[0]._raw.id)
+    ).fetch();
+    const payments = await paymentsCollection.query(
+        Q.where('payer_id', data[0]._raw.id)
+    ).fetch();
+
+    return {
+        data: data[0],
+        properties: properties,
+        invoices: invoices,
+        payments: payments
+    };
 }
 
 const getAllPayers = async () => {
@@ -28,20 +45,11 @@ const getMyPayers = async () => {
     return data;
 }
 
-const getMyPayments = async () => {
-    const data = await paymentsCollection.query(
-        Q.where('created_by', useAuthStore.getState().userData?.id || '')
-    ).fetch();
-
-    return data;
-}
-
 const getMyInvoices = async () => {
 
 }
 
 const getPayerInvoices = async (payerID) => {
-    console.log('payer id',payerID)
     const data = invoicesCollection.query(
         Q.where('payer_id', payerID)
     ).fetch();
@@ -93,7 +101,6 @@ const getFeedPayments = async () => {
 
 const getDashboardStats = async () => {
     const userId = useAuthStore.getState().userData?.id || '';
-    console.log(userId)
     
     // Get all invoices for the current user
     const allInvoices = await invoicesCollection.query(
@@ -148,10 +155,37 @@ const getDashboardStats = async () => {
             return acc + (invoice.amountLeft || 0);
         }, 0)
     }
-    console.log('stats', stats)
 
     return stats;
 };
+
+const getMyPayments = async () => {
+    const data = await paymentsCollection.query(
+        Q.where('created_by', useAuthStore.getState().userData?.id || '')
+    ).fetch();
+
+    return data;
+}
+
+const getAllPayments = async () => {
+    const data = await paymentsCollection.query().fetch();
+    return data;
+}
+
+const getPaymentInfoWithPayerName = async () => {
+    const payments = await getAllPayments();
+    const payers = await getAllPayers();
+
+    const updatedPayments = payments.map((payment) => {
+        const payer = payers.find((payer) => payer.id === payment._raw.payer_id);
+        return {
+            ...payment,
+            payerName: payer ? payer.firstName + ' ' + payer.lastName : ''
+        }
+    })
+
+    return updatedPayments;
+}
 
 export {
     getPayerByTIN,
@@ -164,5 +198,7 @@ export {
     getPayerProperties,
     getFeedPayments,
     getAllInvoices,
-    getDashboardStats
+    getDashboardStats,
+    getPaymentInfoWithPayerName,
+    getAllPayments
 }

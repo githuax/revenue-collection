@@ -83,7 +83,7 @@ const VendorScreen = () => {
         router.push(`/(vendor)/${item.taxId}`)
       }}
     >
-      <View className="flex-row justify-between items-center">
+      <View className="flex-row justify-between items-start">
         <View className="flex-1">
           <Text className="text-text text-lg font-semibold">{item.name}</Text>
           <Text className="text-text/70 mt-1">Tax ID: {item.taxId}</Text>
@@ -102,9 +102,11 @@ const VendorScreen = () => {
             </View>
           </View>
         </View>
-        <View className="items-end">
+        <View className="items-start">
           <Text className="text-primary-dark font-bold">${item.balance.toLocaleString()}</Text>
-          <TouchableOpacity className="mt-2" onPress={() => console.log('View vendor details')}>
+          <TouchableOpacity className="mt-2" onPress={() => {
+            
+          }}>
             <Feather name="chevron-right" size={20} color="#2C3E50" />
           </TouchableOpacity>
         </View>

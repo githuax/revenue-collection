@@ -5,7 +5,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 export default function PropertyCard({
     property
 }) {
-    console.log(property)
     const isPaid = new Date(property.expiryDate) > new Date();
     const isToday = new Date(property.expiryDate).toDateString() === new Date().toDateString();
 
@@ -53,7 +52,7 @@ export default function PropertyCard({
                         {!isPaid && !isToday && ' (Expired)'}
                     </Text>
                 </View>
-                <Text style={styles.taskAmount}>${property.amount.toLocaleString()}</Text>
+                {/* <Text style={styles.taskAmount}>${property.amount.toLocaleString()}</Text> */}
             </View>
         </TouchableOpacity>
     );

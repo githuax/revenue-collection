@@ -68,8 +68,10 @@ const NewInvoiceScreen = () => {
                 invoice.createdBy = useAuthStore.getState().userData?.id || '';
                 invoice.date = Date.now();
                 invoice.amountDue = parseFloat(amount);
-                invoice.dueDate = date;
+                invoice.dueDate = Date.parse(date);
                 invoice.status = INVOICE_STATUS.UNPAID;
+                invoice.notes = description;
+                invoice.ref_no = reference;
             })
         }).then(() => {
             setSuccessModalVisible(true);

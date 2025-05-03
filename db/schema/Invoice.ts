@@ -10,6 +10,7 @@ export const InvoiceSchema = tableSchema({
       { name: 'due_date', type: 'number' },
       { name: 'notes', type: 'string' },
       { name: 'status', type: 'string' },
+      { name: 'ref_no', type: 'string' }
     ],
   })
   

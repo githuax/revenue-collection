@@ -3,6 +3,7 @@ import React from 'react'
 import { Feather } from '@expo/vector-icons'
 
 export default function SearchBar({
+    searchText,
     searchQuery,
     setSearchQuery,
     filterActive,
@@ -14,7 +15,7 @@ export default function SearchBar({
                 <Feather name="search" size={20} color="#8896A6" />
                 <TextInput
                     className="flex-1 ml-2 text-gray-800"
-                    placeholder="Search by payments or reference"
+                    placeholder={searchText || "Search..."}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                     placeholderTextColor="#8896A6"

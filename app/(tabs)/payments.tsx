@@ -17,6 +17,7 @@ import { router } from 'expo-router';
 import database from '~/db';
 import Header from '~/components/Header';
 import SearchBar from '~/components/SearchBar';
+import { getAllPayments, getMyPayments, getPaymentInfoWithPayerName } from '~/services/dbService';
 
 // Mock data for payments
 const MOCK_PAYMENTS = [
@@ -31,11 +32,6 @@ const MOCK_PAYMENTS = [
   { id: '9', vendorName: 'Pet Paradise', amount: 540, date: '2025-03-21', status: 'Pending', method: 'Bank Transfer', reference: 'PMT-2025-009' },
   { id: '10', vendorName: 'Hardware Haven', amount: 1100, date: '2025-03-18', status: 'Completed', method: 'Credit Card', reference: 'PMT-2025-010' },
 ];
-
-const getPayments = async () => {
-  const payments = await database.collections.get('payments').query().fetch();
-  return payments;
-}
 
 const PaymentRecordScreen = () => {
   const [payments, setPayments] = useState([]);
@@ -55,16 +51,29 @@ const PaymentRecordScreen = () => {
   });
 
   useEffect(() => {
-    getPayments().then(data => {
-      console.log('Fetched payments:', data);
+    getMyPayments().then(data => {
+      console.log('Fetched User payments:', data.length);
     })
+  }, []);
 
-    // Simulate API fetch
-    setTimeout(() => {
-      setPayments(MOCK_PAYMENTS);
-      setFilteredPayments(MOCK_PAYMENTS);
+  useEffect(() => {
+    getPaymentInfoWithPayerName().then(data => {
+      console.log('Fetched payments:', data);
+
+      const transformedData = data.map((payment) => ({
+        ...payment,
+        vendorName: payment.payerName,
+        amount: payment._raw.amount || 0,
+        date: Date(payment._raw.createdDate).toString(),
+        status: payment._raw.status,
+        method: payment._raw.payment_method,
+        reference: payment._raw.ref_no,
+      }));
+
+      setPayments(transformedData);
+      setFilteredPayments(transformedData);
       setLoading(false);
-    }, 1000);
+    })
   }, []);
 
   // Filter payments based on search query and active filter
@@ -381,7 +390,7 @@ const PaymentRecordScreen = () => {
       />
 
       {/* Filter Pills */}
-      <View className="px-4 py-3">
+      {/* <View className="px-4 py-3">
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -406,6 +415,9 @@ const PaymentRecordScreen = () => {
             </TouchableOpacity>
           )}
         />
+      </View> */}
+      <View>
+
       </View>
 
       {/* Payment List */}
