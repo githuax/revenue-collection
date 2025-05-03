@@ -103,25 +103,52 @@ const getDashboardStats = async () => {
         )
     ).fetch();
 
-    // Calculate statistics
-    const stats = allInvoices.reduce((acc, invoice) => {
-        console.log('invoice', invoice)
+    // get all invoices ids
+    const invoiceIds = allInvoices.map(invoice => invoice._raw.id);
 
-        const amount = invoice._raw.amount_due || 0;
-        
-        if (invoice._raw.status === INVOICE_STATUS.PAID) {
-            acc.completedPayments += amount;
-        } else {
-            acc.pendingPayments += 1;
-            acc.amountToCollect += amount;
+    const allPayments = await paymentsCollection.query(
+        Q.where('invoice', Q.oneOf(invoiceIds))
+    ).fetch();
+
+    // map all payments to invoices
+    const updatedInvoices = allInvoices.map((invoice) => {
+        const payments = allPayments.filter(payment => payment._raw.invoice === invoice._raw.id);
+        return {
+            ...invoice,
+            payments: payments
         }
-        
-        return acc;
-    }, {
-        pendingPayments: 0,
-        amountToCollect: 0,
-        completedPayments: 0
-    });
+    })
+
+    // remove the amount of payments from each invoice
+    const allInvoicesWithPayments = updatedInvoices.map((invoice) => {
+        const payments = invoice.payments || [];
+        const amountPaid = payments.reduce((acc, payment) => {
+            return acc + (payment._raw.amount || 0);
+        }, 0);
+        const amountDue = invoice._raw.amount_due || 0;
+        const amountLeft = amountDue - amountPaid;
+        return {
+            ...invoice,
+            amountPaid: amountPaid,
+            amountLeft: amountLeft
+        }
+    })
+
+    // Calculate statistics
+    const stats = {
+        totalInvoices: allInvoicesWithPayments.length,
+        totalPayments: allPayments.length,
+        totalAmountDue: allInvoicesWithPayments.reduce((acc, invoice) => {
+            return acc + (invoice._raw.amount_due || 0);
+        }, 0),
+        totalAmountPaid: allInvoicesWithPayments.reduce((acc, invoice) => {
+            return acc + (invoice.amountPaid || 0);
+        }, 0),
+        totalAmountLeft: allInvoicesWithPayments.reduce((acc, invoice) => {
+            return acc + (invoice.amountLeft || 0);
+        }, 0)
+    }
+    console.log('stats', stats)
 
     return stats;
 };

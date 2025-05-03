@@ -11,6 +11,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
+import DashboardStats from '~/components/DashboardStats';
 import Header from '~/components/Header';
 import { getDashboardStats, getFeedPayments } from '~/services/dbService';
 import useAuthStore from '~/store/authStore';
@@ -204,7 +205,7 @@ const Home = () => {
       />
 
       {/* Task Statistics */}
-      <View style={styles.statsContainer}>
+      {/* <View style={styles.statsContainer}>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.pendingCount}</Text>
           <Text style={styles.statLabel}>Pending</Text>
@@ -221,7 +222,8 @@ const Home = () => {
           <Text style={styles.statValue}>{stats.completedCount}</Text>
           <Text style={styles.statLabel}>Completed</Text>
         </View>
-      </View>
+      </View> */}
+      <DashboardStats />
       
       {/* Search Bar */}
       <View style={styles.searchContainer}>

@@ -21,12 +21,13 @@ import { router } from 'expo-router';
 import database from '~/db';
 import Payment from '~/db/model/Payment';
 import SelectPayer from '~/components/SelectPayer';
-import { PAYMENT_METHODS } from '~/services/constants';
+import { DB_SYNC_STATUS, PAYMENT_METHODS } from '~/services/constants';
 import Header from '~/components/Header';
 import DropdownComponent from '~/components/DropDown';
 import DatePicker from '~/components/DatePicker';
 import ReferenceNumber from '~/components/ReferenceNumber';
 import SelectInvoice from '~/components/SelectInvoice';
+import useAuthStore from '~/store/authStore';
 
 const NewPaymentScreen = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -101,8 +102,14 @@ const NewPaymentScreen = () => {
     database.write(async () => {
       const payment = await database.get<Payment>('payments').create(payment => {
         payment.amount = parseFloat(amount);
-        payment.paymentType = paymentMethod;
+        payment.paymentMethod = paymentMethod;
         payment.location = location
+        payment.invoice = invoice;
+        payment.payer_id = selectedVendor.id;
+        payment.status = DB_SYNC_STATUS.PENDING;
+        payment.createdBy = useAuthStore.getState().userData?.id || '';
+        payment.createdDate = new Date();
+        payment.notes = description;
       })
     }).then(() => {
       console.log('Payment saved successfully');
@@ -169,7 +176,9 @@ const NewPaymentScreen = () => {
           <View className="mb-6">
             <Text className="text-text font-bold mb-2">Payer</Text>
             <SelectInvoice
-              onInvoiceSelect={() => {}}
+              onInvoiceSelect={(value) => {
+                setInvoice(value.id);
+              }}
               payerId={selectedVendor ? selectedVendor.id : undefined}
             />
           </View>

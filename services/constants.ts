@@ -62,10 +62,17 @@ const INVOICE_STATUS = {
     PARTIALLY_PAID: 'partially_paid'
 }
 
+const DB_SYNC_STATUS = {
+    PENDING: 'pending',
+    SYNCED: 'synced',
+    CONFLICTED: 'conflicted',
+}
+
 export {
     STATES,
     PAYMENT_METHODS,
     BUSINESS_TYPES,
     INVOICE_STATUS,
-    PROPERTY_TYPES
+    PROPERTY_TYPES,
+    DB_SYNC_STATUS
 }
