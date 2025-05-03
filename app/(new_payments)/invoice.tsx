@@ -26,6 +26,7 @@ import { INVOICE_STATUS } from '~/services/constants';
 import StatusModal from '~/components/modals/Status';
 import { relation } from '@nozbe/watermelondb/decorators';
 import useAuthStore from '~/store/authStore';
+import ReferenceNumber from '~/components/ReferenceNumber';
 
 const NewInvoiceScreen = () => {
     const [selectedVendor, setSelectedVendor] = useState(null);
@@ -91,119 +92,165 @@ const NewInvoiceScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-background">
+        <SafeAreaView className="flex-1 bg-gray-50">
             <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
             <Header
                 text="New Invoice"
+                className="border-b border-gray-200 shadow-sm"
             />
 
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 className="flex-1"
             >
-                <ScrollView className="flex-1 px-4 py-4">
-                    {/* Vendor Search Section */}
-                    <View className="mb-6">
-                        <Text className="text-text font-bold mb-2">Payer</Text>
-                        <SelectPayer
-                            onVendorSelect={selectVendor}
-                        />
+                <ScrollView className="flex-1">
+                    <View className="p-6 pt-0">
+                        {/* Title Section */}
+                        <View className="mb-6">
+                            <Text className="text-gray-500 mt-1">Generate a new invoice for your payer</Text>
+                        </View>
 
-                        {/* Selected Vendor Info */}
-                        {selectedVendor && (
-                            <View className="bg-primary/5 p-3 rounded-lg mt-3 border border-primary/20">
-                                <Text className="text-primary font-bold">{selectedVendor.name}</Text>
-                                <Text className="text-text/70 mt-1">TPIN: {selectedVendor.tpin}</Text>
-                                <Text className="text-text/70">{selectedVendor.address}</Text>
-                                <Text className="text-text/70">{selectedVendor.phoneNumber}</Text>
+                        {/* Payer Selection Card */}
+                        <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+                            <View className="flex-row items-center mb-4">
+                                <Feather name="user" size={22} color="#2C3E50" />
+                                <Text className="text-gray-800 font-bold ml-2 text-lg">Payer Information</Text>
                             </View>
-                        )}
-                    </View>
 
-                    {/* Payment Details Section */}
-                    <View className="mb-6">
-                        <Text className="text-text font-bold mb-2">Invoice Details</Text>
-
-                        {/* Amount */}
-                        <View className="mb-4">
-                            <Text className="text-text/70 mb-1">Amount ($)</Text>
-                            <TextInput
-                                className="bg-white py-3 px-4 rounded-lg border border-gray-300 text-text"
-                                placeholder="0.00"
-                                value={amount}
-                                onChangeText={setAmount}
-                                keyboardType="numeric"
+                            {/* Payer Selection */}
+                            <SelectPayer
+                                onVendorSelect={selectVendor}
+                                className="mb-3"
                             />
-                        </View>
 
-                        {/* Reference Number */}
-                        <View className="mb-4">
-                            <Text className="text-text/70 mb-1">Reference Number</Text>
-                            <View className="flex-row items-center justify-between">
-                                <TextInput
-                                    className="bg-gray-200 py-3 px-4 rounded-lg border border-gray-300 text-text w-[85%]"
-                                    value={reference}
-                                    onChangeText={setReference}
-                                    editable={false}
-                                />
-                                <TouchableOpacity
-                                    className="bg-primary/10 p-3 rounded-lg"
-                                    onPress={generateReference}
-                                >
-                                    <Feather name="refresh-cw" size={20} color="#2C3E50" />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-
-                        {/* Date */}
-                        <View className="mb-4">
-                            <Text className="text-text/70 mb-1">Due Date</Text>
-                            <View
-                                className='flex-row justify-between items-center'
-                            >
-                                <View
-                                    className="bg-gray-200 py-3 px-4 rounded-lg border border-gray-300 w-[85%]"
-                                >
-                                    <Text className="text-text">{formatDate(date)}</Text>
+                            {/* Selected Vendor Info */}
+                            {selectedVendor && (
+                                <View className="bg-blue-50 p-4 rounded-xl mt-3 border border-blue-200">
+                                    <Text className="text-blue-700 font-bold text-base">{selectedVendor.name}</Text>
+                                    <View className="flex-row items-center mt-2">
+                                        <Feather name="credit-card" size={14} color="#4B5563" />
+                                        <Text className="text-gray-600 ml-2">TPIN: {selectedVendor.tpin}</Text>
+                                    </View>
+                                    <View className="flex-row items-center mt-1">
+                                        <Feather name="map-pin" size={14} color="#4B5563" />
+                                        <Text className="text-gray-600 ml-2">{selectedVendor.address}</Text>
+                                    </View>
+                                    <View className="flex-row items-center mt-1">
+                                        <Feather name="phone" size={14} color="#4B5563" />
+                                        <Text className="text-gray-600 ml-2">{selectedVendor.phoneNumber}</Text>
+                                    </View>
                                 </View>
-                                <DatePicker
-                                    activator={({ openPicker }) => (
-                                        <TouchableOpacity onPress={openPicker} className='bg-primary/10 rounded-md w-[12%] py-3 flex-row items-center justify-center'>
-                                            <Feather name="calendar" size={20} color="#2C3E50" />
-                                        </TouchableOpacity>
-                                    )}
-                                    onChange={setDate}
-                                    selectedDate={date}
+                            )}
+                        </View>
+
+                        {/* Invoice Details Card */}
+                        <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+                            <View className="flex-row items-center mb-4">
+                                <Feather name="file-text" size={22} color="#2C3E50" />
+                                <Text className="text-gray-800 font-bold ml-2 text-lg">Invoice Details</Text>
+                            </View>
+
+                            {/* Amount */}
+                            <View className="mb-5">
+                                <Text className="text-gray-700 font-semibold mb-2">Amount</Text>
+                                <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                                    <Feather name="dollar-sign" size={20} color="#4B5563" />
+                                    <TextInput
+                                        className="flex-1 py-3 px-3 text-gray-700"
+                                        placeholder="0.00"
+                                        value={amount}
+                                        onChangeText={setAmount}
+                                        keyboardType="numeric"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
+                                </View>
+                            </View>
+
+                            {/* Reference Number */}
+                            <View className="mb-5">
+                                <Text className="text-gray-700 font-semibold mb-2">Reference Number</Text>
+                                <ReferenceNumber
+                                    prefix="PMT"
+                                    value={reference}
+                                    onChange={setReference}
+                                    editable={false}
+                                    className="bg-gray-100"
                                 />
+                                <Text className="text-xs text-gray-500 ml-1 mt-1">Auto-generated unique payment reference</Text>
+                            </View>
+
+                            {/* Due Date */}
+                            <View className="mb-5">
+                                <Text className="text-gray-700 font-semibold mb-2">Due Date</Text>
+                                <View className="flex-row justify-between items-center">
+                                    <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4 py-3 flex-1 mr-2">
+                                        <Feather name="calendar" size={20} color="#4B5563" />
+                                        <Text className="text-gray-700 ml-3">{formatDate(date)}</Text>
+                                    </View>
+                                    <DatePicker
+                                        activator={({ openPicker }) => (
+                                            <TouchableOpacity
+                                                onPress={openPicker}
+                                                className="bg-blue-100 rounded-xl w-12 h-12 flex-row items-center justify-center"
+                                            >
+                                                <Feather name="calendar" size={24} color="#3B82F6" />
+                                            </TouchableOpacity>
+                                        )}
+                                        onChange={setDate}
+                                        selectedDate={date}
+                                    />
+                                </View>
+                            </View>
+
+                            {/* Description */}
+                            <View>
+                                <Text className="text-gray-700 font-semibold mb-2">Description</Text>
+                                <View className="flex-row items-start border border-gray-200 rounded-xl bg-white px-4">
+                                    <Feather name="file-text" size={20} color="#4B5563" className="mt-3" />
+                                    <TextInput
+                                        className="flex-1 py-3 px-3 text-gray-700"
+                                        placeholder="Enter invoice description"
+                                        value={description}
+                                        onChangeText={setDescription}
+                                        multiline
+                                        numberOfLines={4}
+                                        textAlignVertical="top"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
+                                </View>
+                                <Text className="text-xs text-gray-500 ml-1 mt-1">Provide details about goods or services invoiced</Text>
                             </View>
                         </View>
 
-                        {/* Description */}
-                        <View className="mb-4">
-                            <Text className="text-text/70 mb-1">Description (Optional)</Text>
-                            <TextInput
-                                className="bg-white py-3 px-4 rounded-lg border border-gray-300 text-text"
-                                placeholder="Enter payment description"
-                                value={description}
-                                onChangeText={setDescription}
-                                multiline
-                                numberOfLines={3}
-                                textAlignVertical="top"
-                            />
-                        </View>
+                        {/* Invoice Terms Card - Optional, New Section */}
+                        {/* <View className="bg-white rounded-2xl shadow-md p-6 mb-6"> */}
+                        {/* <View className="flex-row items-center mb-4">
+                                <Feather name="clipboard" size={22} color="#2C3E50" />
+                                <Text className="text-gray-800 font-bold ml-2 text-lg">Invoice Terms</Text>
+                            </View> */}
+
+                        {/* Payment Terms - Optional New Field */}
+                        {/* <View className="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                                <View className="flex-row items-center">
+                                    <Feather name="info" size={16} color="#D97706" />
+                                    <Text className="text-yellow-700 font-semibold ml-2">Payment Terms</Text>
+                                </View>
+                                <Text className="text-gray-600 mt-1">Due within 30 days of invoice date. Late payments may incur additional fees.</Text>
+                            </View> */}
+                        {/* </View> */}
+
+                        <TouchableOpacity
+                            className="bg-blue-600 py-4 rounded-xl items-center shadow-md"
+                            onPress={createInvoice}
+                        >
+                            <View className="flex-row items-center justify-center space-x-2">
+                                <Feather name="check-circle" size={24} color="white" />
+                                <Text className="text-white font-bold text-lg ml-2">Create Invoice</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-
-            {/* Submit Button */}
-            <View className="p-4 bg-white border-t border-gray-200">
-                <TouchableOpacity
-                    className="bg-secondary py-4 rounded-lg items-center"
-                    onPress={createInvoice}
-                >
-                    <Text className="text-white font-bold text-lg">Create Invoice</Text>
-                </TouchableOpacity>
-            </View>
 
             {/* Success Modal */}
             <StatusModal
@@ -228,7 +275,7 @@ const NewInvoiceScreen = () => {
                 autoCloseTime={0} // Don't auto close error modals
             />
         </SafeAreaView>
-    );
+    )
 };
 
 export default NewInvoiceScreen;
