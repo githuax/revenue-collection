@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  FlatList, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
   ActivityIndicator,
   SafeAreaView,
   StatusBar
@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { payersCollection } from '~/db';
 import Payer from '~/db/model/Payer';
 import Header from '~/components/Header';
+import SearchBar from '~/components/SearchBar';
 
 // Mock data for vendors
 const MOCK_VENDORS = [
@@ -32,10 +33,11 @@ const MOCK_VENDORS = [
 const VendorScreen = () => {
   const [vendors, setVendors] = useState<Payer[]>([]);
   const [filteredVendors, setFilteredVendors] = useState([]);
+  const [filterActive, setFilterActive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
-  
+
   useEffect(() => {
     payersCollection.query().fetch().then((result: Payer[]) => {
       const fetchedPayers: Payer[] = [];
@@ -57,25 +59,25 @@ const VendorScreen = () => {
   // Filter vendors based on search query and active filter
   useEffect(() => {
     let result = vendors;
-    
+
     if (searchQuery) {
-      result = result.filter(vendor => 
+      result = result.filter(vendor =>
         vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         vendor.taxId.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (activeFilter !== 'All') {
       result = result.filter(vendor => vendor.status === activeFilter);
     }
-    
+
     setFilteredVendors(result);
   }, [searchQuery, activeFilter, vendors]);
 
   const filterOptions = ['All', 'My Payers'];
 
   const renderVendorItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
       onPress={() => {
         router.push(`/(vendor)/${item.taxId}`)
@@ -87,15 +89,13 @@ const VendorScreen = () => {
           <Text className="text-text/70 mt-1">Tax ID: {item.taxId}</Text>
           <Text className="text-text/70 mt-1">Phone: {item.phone}</Text>
           <View className="flex-row items-center mt-2">
-            <View 
-              className={`px-2 py-1 rounded-full ${
-                item.status === 'Active' ? 'bg-success/20' : 'bg-error/20'
-              }`}
-            >
-              <Text 
-                className={`text-xs ${
-                  item.status === 'Active' ? 'text-success' : 'text-error'
+            <View
+              className={`px-2 py-1 rounded-full ${item.status === 'Active' ? 'bg-success/20' : 'bg-error/20'
                 }`}
+            >
+              <Text
+                className={`text-xs ${item.status === 'Active' ? 'text-success' : 'text-error'
+                  }`}
               >
                 {item.status}
               </Text>
@@ -115,30 +115,19 @@ const VendorScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
-      <Header 
+      <Header
         text='Payers'
         showBackButton={false}
       />
-      
+
       {/* Search Bar */}
-      <View className="px-4 pt-4 pb-2">
-        <View className="flex-row items-center bg-white rounded-lg px-3 py-2">
-          <Feather name="search" size={20} color="#8896A6" />
-          <TextInput
-            className="flex-1 ml-2 text-text"
-            placeholder="Search payers by name or tax ID"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#8896A6"
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Feather name="x" size={20} color="#8896A6" />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-      
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filterActive={filterActive}
+        setFilterActive={setFilterActive}
+      />
+
       {/* Filter Pills */}
       <View className="px-4 py-3">
         <FlatList
@@ -149,18 +138,16 @@ const VendorScreen = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => setActiveFilter(item)}
-              className={`px-4 py-2 mr-2 rounded-full border ${
-                activeFilter === item 
-                  ? 'bg-primary' 
+              className={`px-4 py-2 mr-2 rounded-full border ${activeFilter === item
+                  ? 'bg-primary'
                   : 'bg-gray-100'
-              }`}
-            >
-              <Text 
-                className={`${
-                  activeFilter === item 
-                    ? 'text-white' 
-                    : 'text-text'
                 }`}
+            >
+              <Text
+                className={`${activeFilter === item
+                    ? 'text-white'
+                    : 'text-text'
+                  }`}
               >
                 {item}
               </Text>
@@ -168,7 +155,7 @@ const VendorScreen = () => {
           )}
         />
       </View>
-      
+
       {/* Vendor List */}
       <View className="flex-1 px-4 py-3">
         {loading ? (
@@ -198,9 +185,9 @@ const VendorScreen = () => {
           </>
         )}
       </View>
-      
+
       {/* Add Vendor FAB */}
-      <TouchableOpacity 
+      <TouchableOpacity
         className="absolute bottom-6 right-6 bg-secondary rounded-full w-16 h-16 justify-center items-center shadow-lg"
         onPress={() => {
           router.push('/(vendor)/add');

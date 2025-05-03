@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  FlatList, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
   Modal,
   ScrollView
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import database from '~/db';
 import Header from '~/components/Header';
+import SearchBar from '~/components/SearchBar';
 
 // Mock data for payments
 const MOCK_PAYMENTS = [
@@ -41,6 +42,7 @@ const PaymentRecordScreen = () => {
   const [filteredPayments, setFilteredPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterActive, setFilterActive] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -51,7 +53,7 @@ const PaymentRecordScreen = () => {
     reference: '',
     status: ''
   });
-  
+
   useEffect(() => {
     getPayments().then(data => {
       console.log('Fetched payments:', data);
@@ -68,25 +70,25 @@ const PaymentRecordScreen = () => {
   // Filter payments based on search query and active filter
   useEffect(() => {
     let result = payments;
-    
+
     if (searchQuery) {
-      result = result.filter(payment => 
+      result = result.filter(payment =>
         payment.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         payment.reference.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (activeFilter !== 'All') {
       result = result.filter(payment => payment.status === activeFilter);
     }
-    
+
     setFilteredPayments(result);
   }, [searchQuery, activeFilter, payments]);
 
   const filterOptions = ['All', 'Completed', 'Pending', 'Failed'];
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'Completed':
         return { bg: 'bg-success/20', text: 'text-success' };
       case 'Pending':
@@ -100,10 +102,10 @@ const PaymentRecordScreen = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -132,7 +134,7 @@ const PaymentRecordScreen = () => {
       status: editData.status
     };
 
-    const updatedPayments = payments.map(payment => 
+    const updatedPayments = payments.map(payment =>
       payment.id === updatedPayment.id ? updatedPayment : payment
     );
 
@@ -143,9 +145,9 @@ const PaymentRecordScreen = () => {
 
   const renderPaymentItem = ({ item }) => {
     const statusStyle = getStatusColor(item.status);
-    
+
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
         onPress={() => handleViewPayment(item)}
       >
@@ -174,9 +176,9 @@ const PaymentRecordScreen = () => {
 
   const renderPaymentModal = () => {
     if (!selectedPayment) return null;
-    
+
     const statusStyle = getStatusColor(selectedPayment.status);
-    
+
     return (
       <Modal
         animationType="slide"
@@ -194,7 +196,7 @@ const PaymentRecordScreen = () => {
                 <Feather name="x" size={24} color="#36454F" />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView className="flex-1">
               {!editMode ? (
                 <View>
@@ -202,12 +204,12 @@ const PaymentRecordScreen = () => {
                     <Text className="text-text/50 text-sm">Vendor</Text>
                     <Text className="text-text text-lg">{selectedPayment.vendorName}</Text>
                   </View>
-                  
+
                   <View className="mb-4">
                     <Text className="text-text/50 text-sm">Reference</Text>
                     <Text className="text-text text-lg">{selectedPayment.reference}</Text>
                   </View>
-                  
+
                   <View className="flex-row mb-4">
                     <View className="flex-1 mr-2">
                       <Text className="text-text/50 text-sm">Amount</Text>
@@ -215,19 +217,19 @@ const PaymentRecordScreen = () => {
                         ${selectedPayment.amount.toLocaleString()}
                       </Text>
                     </View>
-                    
+
                     <View className="flex-1 ml-2">
                       <Text className="text-text/50 text-sm">Date</Text>
                       <Text className="text-text text-lg">{formatDate(selectedPayment.date)}</Text>
                     </View>
                   </View>
-                  
+
                   <View className="flex-row mb-4">
                     <View className="flex-1 mr-2">
                       <Text className="text-text/50 text-sm">Payment Method</Text>
                       <Text className="text-text text-lg">{selectedPayment.method}</Text>
                     </View>
-                    
+
                     <View className="flex-1 ml-2">
                       <Text className="text-text/50 text-sm">Status</Text>
                       <View className={`mt-1 px-3 py-1 rounded-full self-start ${statusStyle.bg}`}>
@@ -242,27 +244,27 @@ const PaymentRecordScreen = () => {
                     <Text className="text-text/50 text-sm mb-1">Vendor</Text>
                     <Text className="text-text text-lg">{selectedPayment.vendorName}</Text>
                   </View>
-                  
+
                   <View className="mb-4">
                     <Text className="text-text/50 text-sm mb-1">Reference</Text>
                     <TextInput
                       className="border border-gray-300 rounded-lg p-2 text-text"
                       value={editData.reference}
-                      onChangeText={(text) => setEditData({...editData, reference: text})}
+                      onChangeText={(text) => setEditData({ ...editData, reference: text })}
                     />
                   </View>
-                  
+
                   <View className="flex-row mb-4">
                     <View className="flex-1 mr-2">
                       <Text className="text-text/50 text-sm mb-1">Amount</Text>
                       <TextInput
                         className="border border-gray-300 rounded-lg p-2 text-text"
                         value={editData.amount}
-                        onChangeText={(text) => setEditData({...editData, amount: text})}
+                        onChangeText={(text) => setEditData({ ...editData, amount: text })}
                         keyboardType="numeric"
                       />
                     </View>
-                    
+
                     <View className="flex-1 ml-2">
                       <Text className="text-text/50 text-sm mb-1">Date</Text>
                       <Text className="text-text p-2 border border-gray-300 rounded-lg bg-gray-100">
@@ -270,14 +272,14 @@ const PaymentRecordScreen = () => {
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View className="flex-row mb-4">
                     <View className="flex-1 mr-2">
                       <Text className="text-text/50 text-sm mb-1">Payment Method</Text>
                       <View className="border border-gray-300 rounded-lg">
                         <Picker
                           selectedValue={editData.method}
-                          onValueChange={(value) => setEditData({...editData, method: value})}
+                          onValueChange={(value) => setEditData({ ...editData, method: value })}
                           className="text-text"
                         >
                           <Picker.Item label="Bank Transfer" value="Bank Transfer" />
@@ -287,13 +289,13 @@ const PaymentRecordScreen = () => {
                         </Picker>
                       </View>
                     </View>
-                    
+
                     <View className="flex-1 ml-2">
                       <Text className="text-text/50 text-sm mb-1">Status</Text>
                       <View className="border border-gray-300 rounded-lg">
                         <Picker
                           selectedValue={editData.status}
-                          onValueChange={(value) => setEditData({...editData, status: value})}
+                          onValueChange={(value) => setEditData({ ...editData, status: value })}
                           className="text-text"
                         >
                           <Picker.Item label="Completed" value="Completed" />
@@ -306,7 +308,7 @@ const PaymentRecordScreen = () => {
                 </View>
               )}
             </ScrollView>
-            
+
             <View className="flex-row justify-end pt-4 border-t border-gray-200">
               {!editMode ? (
                 <TouchableOpacity
@@ -341,12 +343,12 @@ const PaymentRecordScreen = () => {
   // For demonstration purposes only - in a real app we'd use a proper Picker component
   const Picker = ({ children, selectedValue, onValueChange }) => {
     return (
-      <TouchableOpacity 
+      <TouchableOpacity
         className="p-2"
         onPress={() => {
           // In a real implementation, this would show a proper picker
           console.log('Would show picker with options:', children.map(c => c.props.value));
-          
+
           // For demo purposes, we'll cycle through options when clicked
           const values = children.map(c => c.props.value);
           const currentIndex = values.indexOf(selectedValue);
@@ -358,37 +360,26 @@ const PaymentRecordScreen = () => {
       </TouchableOpacity>
     );
   };
-  
+
   Picker.Item = ({ label, value }) => null;
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
-      
-      <Header 
+
+      <Header
         text='Payments'
         showBackButton={false}
       />
-      
+
       {/* Search Bar */}
-      <View className="px-4 pt-4 pb-2">
-        <View className="flex-row items-center bg-white rounded-lg px-3 py-2">
-          <Feather name="search" size={20} color="#8896A6" />
-          <TextInput
-            className="flex-1 ml-2 text-text"
-            placeholder="Search by payments or reference"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#8896A6"
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Feather name="x" size={20} color="#8896A6" />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-      
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        filterActive={filterActive}
+        setFilterActive={setFilterActive}
+      />
+
       {/* Filter Pills */}
       <View className="px-4 py-3">
         <FlatList
@@ -399,18 +390,16 @@ const PaymentRecordScreen = () => {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => setActiveFilter(item)}
-              className={`px-4 py-2 mr-2 rounded-full border ${
-                activeFilter === item 
-                  ? 'bg-primary' 
+              className={`px-4 py-2 mr-2 rounded-full border ${activeFilter === item
+                  ? 'bg-primary'
                   : 'bg-gray-100'
-              }`}
-            >
-              <Text 
-                className={`${
-                  activeFilter === item 
-                    ? 'text-white' 
-                    : 'text-text'
                 }`}
+            >
+              <Text
+                className={`${activeFilter === item
+                    ? 'text-white'
+                    : 'text-text'
+                  }`}
               >
                 {item}
               </Text>
@@ -418,7 +407,7 @@ const PaymentRecordScreen = () => {
           )}
         />
       </View>
-      
+
       {/* Payment List */}
       <View className="flex-1 px-4 py-3">
         {loading ? (
@@ -453,17 +442,17 @@ const PaymentRecordScreen = () => {
           </>
         )}
       </View>
-      
+
       {/* Add Payment FAB */}
-      <TouchableOpacity 
+      <TouchableOpacity
         className="absolute bottom-6 right-6 bg-secondary rounded-full w-16 h-16 justify-center items-center shadow-lg"
         onPress={() => {
-            router.push('/(new_payments)')
+          router.push('/(new_payments)')
         }}
       >
         <Feather name="plus" size={24} color="white" />
       </TouchableOpacity>
-      
+
       {/* Payment Details Modal */}
       {renderPaymentModal()}
     </SafeAreaView>
