@@ -177,7 +177,7 @@ const Profile = () => {
                 <Text style={styles.inputLabel}>Full Name</Text>
                 <TextInput
                   style={styles.input}
-                  value={tempUser.name}
+                  value={userData?.first_name + ' ' + userData?.last_name}
                   onChangeText={(text) => setTempUser({...tempUser, name: text})}
                   placeholder="Enter your full name"
                 />
@@ -187,7 +187,7 @@ const Profile = () => {
                 <Text style={styles.inputLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  value={tempUser.email}
+                  value={user.email}
                   onChangeText={(text) => setTempUser({...tempUser, email: text})}
                   placeholder="Enter your email address"
                   keyboardType="email-address"
