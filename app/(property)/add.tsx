@@ -8,14 +8,22 @@ import { Ionicons } from '@expo/vector-icons'
 import Header from '~/components/Header'
 import ReferenceNumber from '~/components/ReferenceNumber'
 import SelectPayer from '~/components/SelectPayer'
+import DropdownComponent from '~/components/DropDown'
+import { PROPERTY_TYPES } from '~/services/constants'
 
 export default function Add() {
   const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
+
+  const transformedPropertyTypes = PROPERTY_TYPES.map((type) => ({
+    label: type,
+    value: type,
+  }))
 
   const [propertyData, setPropertyData] = useState({
     property_ref_no: null,
     address: '',
     geolocation: '',
+    current_assess_value: '',
     assess_payment: '',
     payment_expiry_date: '',
     type: '',
@@ -33,7 +41,7 @@ export default function Add() {
   const handleSubmit = async () => {
     try {
       const propertiesCollection = database.collections.get<Property>('properties')
-
+      
       await database.write(async () => {
         await propertiesCollection.create((property: Property) => {
           property.propertyRefNo = propertyData.property_ref_no
@@ -41,7 +49,7 @@ export default function Add() {
           property.geolocation = propertyData.geolocation
           property.assessPayment = propertyData.assess_payment
           property.paymentExpiryDate = new Date(propertyData.payment_expiry_date).getTime()
-          property.type = propertyData.type
+          property.type = propertyData.type.value
           property.notes = propertyData.notes
           property.images = propertyData.images
           property.ownerId = propertyData.payer.id
@@ -134,16 +142,32 @@ export default function Add() {
           <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
             <Text className="text-xl font-bold text-gray-800 mb-4">Financial Information</Text>
 
-            {/* Assessment Payment */}
+            {/* Assessed Payment */}
             <View className="mb-5">
-              <Text className="text-gray-700 font-semibold mb-2 text-base">Assessment Payment</Text>
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Current Assessed Value</Text>
+              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
+                <Ionicons name="cash-outline" size={20} color="#4B5563" />
+                <TextInput
+                  className="flex-1 py-3 px-3 text-gray-700"
+                  value={propertyData.current_assess_value}
+                  onChangeText={(text) => setPropertyData({ ...propertyData, current_assess_value: text })}
+                  placeholder="Enter current assessed value"
+                  keyboardType="numeric"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            {/* Assessed Payment */}
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Assessed Payment</Text>
               <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
                 <Ionicons name="cash-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.assess_payment}
                   onChangeText={(text) => setPropertyData({ ...propertyData, assess_payment: text })}
-                  placeholder="Enter assessment payment amount"
+                  placeholder="Enter assessed payment amount"
                   keyboardType="numeric"
                   placeholderTextColor="#9CA3AF"
                 />
@@ -152,7 +176,7 @@ export default function Add() {
 
             {/* Payment Expiry Date */}
             <View className="mb-5">
-              <Text className="text-gray-700 font-semibold mb-2 text-base">Payment Expiry Date</Text>
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Payment Due Date</Text>
               <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
                 <Ionicons name="calendar-outline" size={20} color="#4B5563" />
                 <TextInput
@@ -173,16 +197,14 @@ export default function Add() {
             {/* Property Type with Radio Options */}
             <View className="mb-5">
               <Text className="text-gray-700 font-semibold mb-2 text-base">Property Type</Text>
-              <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
-                <Ionicons name="business-outline" size={20} color="#4B5563" />
-                <TextInput
-                  className="flex-1 py-3 px-3 text-gray-700"
-                  value={propertyData.type}
-                  onChangeText={(text) => setPropertyData({ ...propertyData, type: text })}
-                  placeholder="e.g., Residential, Commercial"
-                  placeholderTextColor="#9CA3AF"
+              <DropdownComponent 
+                  data={transformedPropertyTypes}
+                  onChange={(value) => setPropertyData({ ...propertyData, type: value })}
+                  placeholder="Select Type"
+                  isSearchable={false}
+                  initialValue={propertyData.type}
+                  leftIcon={<Ionicons name="business-outline" size={20} color="#4B5563" className='mr-3'/>}
                 />
-              </View>
             </View>
 
             {/* Notes */}
