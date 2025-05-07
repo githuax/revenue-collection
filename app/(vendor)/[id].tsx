@@ -135,6 +135,25 @@ export default function PayerDetails() {
                     </View>
                 </View>
 
+                 {/* Payments Generated for this Payer */}
+                 <View className='p-4'>
+                    <SectionHeader
+                        title='Payments'
+                        addButtonText='+ Add Payment'
+                        action={() => { 
+                            router.push('/(new_payments)')
+                         }}
+                    />
+                    {payments.map((payment) => (
+                        <View key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
+                            <Text className='text-text font-semibold'>Payment ID: {payment.id}</Text>
+                            <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
+                            <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
+                            <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
+                        </View>
+                    ))}
+                </View>
+
                 {/* Properties Owned */}
                 <View className='p-4'>
                     <SectionHeader
@@ -167,7 +186,16 @@ export default function PayerDetails() {
                         title='Invoices'
                         addButtonText='+ Add Invoice'
                         action={() => { 
-                            router.push('/(new_payments)/invoice')
+                            router.push({
+                                pathname: '/(new_payments)/invoice',
+                                params: {
+                                    payerId: payerDetails?.id,
+                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
+                                    payerAddress: payerDetails?.address,
+                                    payerPhone: payerDetails?.phone,
+                                    payerTIN: payerDetails?.tin,
+                                },
+                            });
                          }}
                     />
                     {invoices.map((invoice) => (
@@ -176,26 +204,6 @@ export default function PayerDetails() {
                             <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
                             <Text className='text-text/70 mt-1'>Date: {invoice.due_date}</Text>
                             <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
-                        </View>
-                    ))}
-                </View>
-
-
-                {/* Payments Generated for this Payer */}
-                <View className='p-4'>
-                    <SectionHeader
-                        title='Payments'
-                        addButtonText='+ Add Payment'
-                        action={() => { 
-                            router.push('/(new_payments)')
-                         }}
-                    />
-                    {payments.map((payment) => (
-                        <View key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-                            <Text className='text-text font-semibold'>Payment ID: {payment.id}</Text>
-                            <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
-                            <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
-                            <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
                         </View>
                     ))}
                 </View>

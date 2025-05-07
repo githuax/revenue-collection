@@ -15,7 +15,7 @@ import {
     Button
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import database, { invoicesCollection } from '~/db';
 import SelectPayer from '~/components/SelectPayer';
@@ -29,22 +29,26 @@ import useAuthStore from '~/store/authStore';
 import ReferenceNumber from '~/components/ReferenceNumber';
 
 const NewInvoiceScreen = () => {
-    const [selectedVendor, setSelectedVendor] = useState(null);
+    const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
+
+    const [selectedVendor, setSelectedVendor] = useState(
+        payerId
+            ? {
+                  value: payerId,
+                  name: payerName,
+                  address: payerAddress,
+                  phoneNumber: payerPhone,
+                  tpin: payerTIN,
+              }
+            : null
+    );
     const [amount, setAmount] = useState('');
-    const [reference, setReference] = useState(`PMT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+    const [reference, setReference] = useState(null);
     const [date, setDate] = useState(new Date());
     const [description, setDescription] = useState('');
 
     const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [errorModalVisible, setErrorModalVisible] = useState(false);
-
-    // Generate unique reference number
-    const generateReference = () => {
-        const prefix = 'PMT';
-        const year = new Date().getFullYear();
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
-        setReference(`${prefix}-${year}-${randomNum}`);
-    };
 
     // Handle vendor selection
     const selectVendor = (vendor) => {
@@ -120,6 +124,7 @@ const NewInvoiceScreen = () => {
                             {/* Payer Selection */}
                             <SelectPayer
                                 onVendorSelect={selectVendor}
+                                selectedVendor={selectedVendor}
                                 className="mb-3"
                             />
 
@@ -170,7 +175,7 @@ const NewInvoiceScreen = () => {
                             <View className="mb-5">
                                 <Text className="text-gray-700 font-semibold mb-2">Reference Number</Text>
                                 <ReferenceNumber
-                                    prefix="PMT"
+                                    prefix="INV"
                                     value={reference}
                                     onChange={setReference}
                                     editable={false}

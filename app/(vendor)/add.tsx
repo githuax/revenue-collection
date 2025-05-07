@@ -12,13 +12,14 @@ import Payer from '~/db/model/Payer'
 import { router } from 'expo-router'
 import { BUSINESS_TYPES } from '~/services/constants'
 import useAuthStore from '~/store/authStore'
-import { Ionicons } from '@expo/vector-icons'
+import { Feather, Ionicons } from '@expo/vector-icons'
 
 export default function Add() {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
+  const [location, setLocation] = useState<string>('');
   const [tin, setTin] = useState<string>('');
   const [isPropertyOwner, setIsPropertyOwner] = useState<boolean>(false);
   const [isVendor, setIsVendor] = useState<boolean>(false);
@@ -117,21 +118,6 @@ export default function Add() {
 
               <View className="mb-4">
                 <TextInput
-                  icon={<Ionicons name="mail-outline" size={20} color="#4B5563" />}
-                  placeholder='Email'
-                  value={email}
-                  onChangeText={(text => { setEmail(text) })}
-                  onSubmitEditing={() => { }}
-                  autoCapitalize='none'
-                  autoCorrect={false}
-                  keyboardType='email-address'
-                  className="flex-1 py-3 px-3 text-gray-700"
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
-
-              <View>
-                <TextInput
                   icon={<Ionicons name="call-outline" size={20} color="#4B5563" />}
                   placeholder='Phone'
                   value={phone}
@@ -140,49 +126,42 @@ export default function Add() {
                   autoCapitalize='none'
                   autoCorrect={false}
                   keyboardType='phone-pad'
-                  className="flex-1 py-3 px-3 text-gray-700"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+
+              <View className="mb-4">
+                <TextInput
+                  icon={<Feather name="map-pin" size={20} color="#4B5563" />}
+                  placeholder='Location'
+                  value={location}
+                  onChangeText={(text => { setLocation(text) })}
+                  onSubmitEditing={() => { }}
+                  autoCapitalize='none'
+                  autoCorrect={false}
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+
+              <View>
+                <TextInput
+                  icon={<Ionicons name="mail-outline" size={20} color="#4B5563" />}
+                  placeholder='Email'
+                  value={email}
+                  onChangeText={(text => { setEmail(text) })}
+                  onSubmitEditing={() => { }}
+                  autoCapitalize='none'
+                  autoCorrect={false}
+                  keyboardType='email-address'
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
             </View>
           </View>
 
-          {/* Business Information Card */}
+          {/* Payer Types Card */}
           <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <Text className="text-xl font-bold text-gray-800 mb-4">Business Information</Text>
-
-            {/* TIN Field */}
-            <View className="mb-5">
-              <TextInput
-                icon={<Ionicons name="card-outline" size={20} color="#4B5563" />}
-                placeholder='Tax Identification Number'
-                value={tin}
-                onChangeText={(text => { setTin(text) })}
-                onSubmitEditing={() => { }}
-                autoCapitalize='words'
-                autoCorrect={false}
-                keyboardType='default'
-                className="flex-1 py-3 px-3 text-gray-700"
-                placeholderTextColor="#9CA3AF"
-              />
-            </View>
-
-            {/* Business Type Dropdown */}
-            <View className="mb-5">
-              <Text className="text-gray-700 font-semibold mb-2 text-base">Business Type</Text>
-              <View className="border border-gray-200 rounded-xl overflow-hidden">
-                <Select
-                  options={businessTypeOptions}
-                  onChange={handleBusinessTypeChange}
-                  className="bg-white px-4 py-3"
-                />
-              </View>
-            </View>
-          </View>
-
-          {/* Roles & Relationships Card */}
-          <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <Text className="text-xl font-bold text-gray-800 mb-4">Roles & Relationships</Text>
+            <Text className="text-xl font-bold text-gray-800 mb-4">Payer Types</Text>
 
             {/* Property Owner Switch */}
             <View className="flex-row items-center justify-between py-3 border-b border-gray-100">
@@ -216,6 +195,39 @@ export default function Add() {
                 trackColor={{ false: "#DBEAFE", true: "#93C5FD" }}
                 thumbColor={isVendor ? "#3B82F6" : "#E5E7EB"}
               />
+            </View>
+          </View>
+
+          {/* Business Information Card */}
+          <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+            <Text className="text-xl font-bold text-gray-800 mb-4">Business Information</Text>
+
+            {/* TIN Field */}
+            <View className="mb-5">
+              <TextInput
+                icon={<Ionicons name="card-outline" size={20} color="#4B5563" />}
+                placeholder='Tax Identification Number'
+                value={tin}
+                onChangeText={(text => { setTin(text) })}
+                onSubmitEditing={() => { }}
+                autoCapitalize='words'
+                autoCorrect={false}
+                keyboardType='default'
+                className="flex-1 py-3 px-3 text-gray-700"
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+
+            {/* Business Type Dropdown */}
+            <View className="mb-5">
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Business Type</Text>
+              <View className="border border-gray-200 rounded-xl overflow-hidden">
+                <Select
+                  options={businessTypeOptions}
+                  onChange={handleBusinessTypeChange}
+                  className="bg-white px-4 py-3"
+                />
+              </View>
             </View>
           </View>
 

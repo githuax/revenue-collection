@@ -194,22 +194,6 @@ const NewPaymentScreen = () => {
               )}
             </View>
 
-            {/* Invoice Selection Card */}
-            <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
-              <View className="flex-row items-center mb-4">
-                <Feather name="file-text" size={22} color="#2C3E50" />
-                <Text className="text-gray-800 font-bold ml-2 text-lg">Invoice Selection</Text>
-              </View>
-
-              <SelectInvoice
-                onInvoiceSelect={(value) => {
-                  setInvoice(value.id);
-                }}
-                payerId={selectedVendor ? selectedVendor.id : undefined}
-                className="bg-white rounded-lg"
-              />
-            </View>
-
             {/* Payment Details Card */}
             <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
               <View className="flex-row items-center mb-4">
@@ -330,6 +314,22 @@ const NewPaymentScreen = () => {
                   </View>
                 )}
               </View>
+            </View>
+
+            {/* Invoice Card */}
+            <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
+              <View className="flex-row items-center mb-4">
+                <Feather name="file-text" size={22} color="#2C3E50" />
+                <Text className="text-gray-800 font-bold ml-2 text-lg">Invoice</Text>
+              </View>
+
+              <SelectInvoice
+                onInvoiceSelect={(value) => {
+                  setInvoice(value.id);
+                }}
+                payerId={selectedVendor ? selectedVendor.id : undefined}
+                className="bg-white rounded-lg"
+              />
             </View>
 
             <TouchableOpacity

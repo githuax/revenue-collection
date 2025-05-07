@@ -80,7 +80,7 @@ export default function Add() {
 
             {/* Payer to whom the property belong - Highlighted Section */}
             <View className="mb-5 bg-blue-50 p-4 rounded-xl">
-              <Text className="text-blue-700 font-semibold mb-2 text-base">Belongs to</Text>
+              <Text className="text-blue-700 font-semibold mb-2 text-base">Owner</Text>
               <SelectPayer
                 onVendorSelect={(vendor) => {
                   setPropertyData({
@@ -111,14 +111,14 @@ export default function Add() {
 
             {/* Geolocation */}
             <View className="mb-5">
-              <Text className="text-gray-700 font-semibold mb-2 text-base">Geolocation</Text>
+              <Text className="text-gray-700 font-semibold mb-2 text-base">Property Code</Text>
               <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
                 <Ionicons name="map-outline" size={20} color="#4B5563" />
                 <TextInput
                   className="flex-1 py-3 px-3 text-gray-700"
                   value={propertyData.geolocation}
                   onChangeText={(text) => setPropertyData({ ...propertyData, geolocation: text })}
-                  placeholder="Enter geolocation coordinates"
+                  placeholder="Enter google plus code"
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
