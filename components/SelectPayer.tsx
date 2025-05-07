@@ -8,9 +8,10 @@ import { useCameraPermissions } from 'expo-camera';
 import { getAllPayers } from '~/services/dbService';
 
 export default function SelectPayer({
+    value,
     onVendorSelect
 }) {
-    const [selectedVendor, setSelectedVendor] = useState(null);
+    const [selectedVendor, setSelectedVendor] = useState(value);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
@@ -75,6 +76,8 @@ export default function SelectPayer({
             <View className='w-[85%]'>
             <DropdownComponent
                 data={payers}
+                valueField='id'
+                initialValue={selectedVendor}
                 placeholder="Select Payer"
                 searchPlaceholder="Search by name, TPIN or phone number"
                 onChange={selectVendor}

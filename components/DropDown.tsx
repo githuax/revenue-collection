@@ -5,12 +5,15 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 const DropdownComponent = ({
   data,
+  initialValue,
   placeholder = "Select item",
   searchPlaceholder = "Search...",
   onChange,
   isSearchable = true,
+  valueField = "value",
+  labelField = "label",
 }) => {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(initialValue);
 
   const renderItem = item => {
     return (
@@ -45,8 +48,8 @@ const DropdownComponent = ({
       data={data}
       search={isSearchable}
       maxHeight={300}
-      labelField="label"
-      valueField="value"
+      labelField={labelField}
+      valueField={valueField}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
       value={value}

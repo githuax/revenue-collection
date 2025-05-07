@@ -35,6 +35,7 @@ const NewInvoiceScreen = () => {
         payerId
             ? {
                   value: payerId,
+                  id: payerId,
                   name: payerName,
                   address: payerAddress,
                   phoneNumber: payerPhone,
@@ -124,7 +125,7 @@ const NewInvoiceScreen = () => {
                             {/* Payer Selection */}
                             <SelectPayer
                                 onVendorSelect={selectVendor}
-                                selectedVendor={selectedVendor}
+                                value={selectedVendor}
                                 className="mb-3"
                             />
 

@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import database from '~/db';
 import Payment from '~/db/model/Payment';
@@ -30,7 +30,20 @@ import SelectInvoice from '~/components/SelectInvoice';
 import useAuthStore from '~/store/authStore';
 
 const NewPaymentScreen = () => {
-  const [selectedVendor, setSelectedVendor] = useState(null);
+  const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
+
+   const [selectedVendor, setSelectedVendor] = useState(
+          payerId
+              ? {
+                    value: payerId,
+                    id: payerId,
+                    name: payerName,
+                    address: payerAddress,
+                    phoneNumber: payerPhone,
+                    tpin: payerTIN,
+                }
+              : null
+      );
   const [invoice, setInvoice] = useState(null);
   const [amount, setAmount] = useState('');
   const [reference, setReference] = useState('');
@@ -171,6 +184,7 @@ const NewPaymentScreen = () => {
               {/* Payer Selection */}
               <SelectPayer
                 onVendorSelect={selectVendor}
+                value={selectedVendor}
                 className="mb-3"
               />
 

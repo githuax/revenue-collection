@@ -7,14 +7,6 @@ import Payer from '~/db/model/Payer'
 import Chip from '~/components/Chip'
 import PropertyCard from '~/components/PropertyCard'
 
-// const MOCK_PROPERTIES = [
-//     { id: '1', name: 'Property 1', address: '123 Main St' },
-//     { id: '2', name: 'Property 2', address: '456 Elm St' },
-//     { id: '3', name: 'Property 3', address: '789 Oak St' },
-//     { id: '4', name: 'Property 4', address: '101 Pine St' },
-//     { id: '5', name: 'Property 5', address: '202 Maple St' },
-// ]
-
 const MOCK_PROPERTIES = [
     {
         id: '1',
@@ -141,7 +133,16 @@ export default function PayerDetails() {
                         title='Payments'
                         addButtonText='+ Add Payment'
                         action={() => { 
-                            router.push('/(new_payments)')
+                            router.push({
+                                pathname: '/(new_payments)',
+                                params: {
+                                    payerId: payerDetails?.id,
+                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
+                                    payerAddress: payerDetails?.address,
+                                    payerPhone: payerDetails?.phone,
+                                    payerTIN: payerDetails?.tin,
+                                },
+                            });
                          }}
                     />
                     {payments.map((payment) => (
@@ -160,7 +161,16 @@ export default function PayerDetails() {
                         title='Properties Owned'
                         addButtonText='+ Add Property'
                         action={() => {
-                            router.push('/(property)/add')
+                            router.push({
+                                pathname: '/(property)/add',
+                                params: {
+                                    payerId: payerDetails?.id,
+                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
+                                    payerAddress: payerDetails?.address,
+                                    payerPhone: payerDetails?.phone,
+                                    payerTIN: payerDetails?.tin,
+                                },
+                            });
                          }}
                     />
                     {MOCK_PROPERTIES.map((property) => (

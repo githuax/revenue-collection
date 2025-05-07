@@ -1,6 +1,6 @@
 import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native'
-import React, { useState } from 'react'
-import { router } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { router, useLocalSearchParams } from 'expo-router'
 import database from '../../db'
 import Property from '../../db/model/Property'
 import Payer from '../../db/model/Payer'
@@ -10,8 +10,10 @@ import ReferenceNumber from '~/components/ReferenceNumber'
 import SelectPayer from '~/components/SelectPayer'
 
 export default function Add() {
+  const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
+
   const [propertyData, setPropertyData] = useState({
-    property_ref_no: '',
+    property_ref_no: null,
     address: '',
     geolocation: '',
     assess_payment: '',
@@ -19,16 +21,18 @@ export default function Add() {
     type: '',
     notes: '',
     images: '',
-    payer: null,
+    payer: payerId ? {
+      id: payerId,
+      name: payerName,
+      address: payerAddress,
+      phone: payerPhone,
+      tin: payerTIN
+    } : null,
   })
 
   const handleSubmit = async () => {
     try {
       const propertiesCollection = database.collections.get<Property>('properties')
-      const payersCollection = database.collections.get<Payer>('payers')
-
-      // Get the owner (payer) - for now using a hardcoded ID
-      const owner = await payersCollection.query().fetch();
 
       await database.write(async () => {
         await propertiesCollection.create((property: Property) => {
@@ -82,6 +86,7 @@ export default function Add() {
             <View className="mb-5 bg-blue-50 p-4 rounded-xl">
               <Text className="text-blue-700 font-semibold mb-2 text-base">Owner</Text>
               <SelectPayer
+                value={propertyData.payer}
                 onVendorSelect={(vendor) => {
                   setPropertyData({
                     ...propertyData, payer: vendor
