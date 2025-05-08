@@ -12,6 +12,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { payersCollection } from '~/db';
+import { withObservables } from '@nozbe/watermelondb/react';
 import Payer from '~/db/model/Payer';
 import Header from '~/components/Header';
 import SearchBar from '~/components/SearchBar';
@@ -30,53 +31,8 @@ const MOCK_VENDORS = [
   { id: '10', name: 'Hardware Haven', phone: '012-345-6789', status: 'Inactive', taxId: 'TX01234', balance: 0 },
 ];
 
-const VendorScreen = () => {
-  const [vendors, setVendors] = useState<Payer[]>([]);
-  const [filteredVendors, setFilteredVendors] = useState([]);
-  const [filterActive, setFilterActive] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
-
-  useEffect(() => {
-    payersCollection.query().fetch().then((result: Payer[]) => {
-      const fetchedPayers: Payer[] = [];
-      result.forEach((vendor) => {
-        fetchedPayers.push({
-          id: vendor.id,
-          name: vendor.firstName + ' ' + vendor.lastName,
-          phone: vendor.phone,
-          status: vendor.propertyOwner ? 'Active' : 'Inactive',
-          taxId: vendor.tin,
-          balance: 0,
-        })
-      })
-      setVendors(fetchedPayers);
-      setLoading(false);
-    })
-  }, []);
-
-  // Filter vendors based on search query and active filter
-  useEffect(() => {
-    let result = vendors;
-
-    if (searchQuery) {
-      result = result.filter(vendor =>
-        vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        vendor.taxId.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (activeFilter !== 'All') {
-      result = result.filter(vendor => vendor.status === activeFilter);
-    }
-
-    setFilteredVendors(result);
-  }, [searchQuery, activeFilter, vendors]);
-
-  const filterOptions = ['All', 'My Payers'];
-
-  const renderVendorItem = ({ item }) => (
+const renderVendorItem = ({ item }) => {
+  return (
     <TouchableOpacity
       className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
       onPress={() => {
@@ -103,16 +59,24 @@ const VendorScreen = () => {
           </View>
         </View>
         <View className="items-start">
-          <Text className="text-primary-dark font-bold">${item.balance.toLocaleString()}</Text>
+          <Text className="text-primary-dark font-bold">${(item.balance || '').toLocaleString()}</Text>
           <TouchableOpacity className="mt-2" onPress={() => {
-            
+
           }}>
             <Feather name="chevron-right" size={20} color="#2C3E50" />
           </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
-  );
+  )
+};
+
+const VendorScreen = () => {
+  const [filterActive, setFilterActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  const filterOptions = ['All', 'My Payers'];
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -141,14 +105,14 @@ const VendorScreen = () => {
             <TouchableOpacity
               onPress={() => setActiveFilter(item)}
               className={`px-4 py-2 mr-2 rounded-full border ${activeFilter === item
-                  ? 'bg-primary'
-                  : 'bg-gray-100'
+                ? 'bg-primary'
+                : 'bg-gray-100'
                 }`}
             >
               <Text
                 className={`${activeFilter === item
-                    ? 'text-white'
-                    : 'text-text'
+                  ? 'text-white'
+                  : 'text-text'
                   }`}
               >
                 {item}
@@ -160,32 +124,9 @@ const VendorScreen = () => {
 
       {/* Vendor List */}
       <View className="flex-1 px-4 py-3">
-        {loading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#2C3E50" />
-            <Text className="text-text mt-2">Loading payers...</Text>
-          </View>
-        ) : filteredVendors.length === 0 ? (
-          <View className="flex-1 justify-center items-center">
-            <Feather name="alert-circle" size={50} color="#8896A6" />
-            <Text className="text-text text-lg mt-4">No payers found</Text>
-            <Text className="text-text/70 text-center mt-2">
-              Try adjusting your search or filters to find what you're looking for
-            </Text>
-          </View>
-        ) : (
-          <>
-            <Text className="text-text mb-3">
-              {filteredVendors.length} {filteredVendors.length === 1 ? 'payer' : 'payers'} found
-            </Text>
-            <FlatList
-              data={filteredVendors}
-              keyExtractor={(item) => item.id}
-              renderItem={renderVendorItem}
-              showsVerticalScrollIndicator={false}
-            />
-          </>
-        )}
+        <EnhancedPayerList
+          searchQuery={searchQuery}
+        />
       </View>
 
       {/* Add Vendor FAB */}
@@ -200,5 +141,71 @@ const VendorScreen = () => {
     </SafeAreaView>
   );
 };
+
+const PayersList = ({
+  searchQuery,
+  payers
+}) => {
+  const [filteredVendors, setFilteredVendors] = useState(payers);
+
+  useEffect(() => {
+    let result = payers;
+
+    result = result.map((payer) => ({
+      id: payer.id,
+      name: payer.firstName + ' ' + payer.lastName,
+      phone: payer.phone,
+      status: payer.propertyOwner ? 'Active' : 'Inactive',
+      taxId: payer.tin,
+      balance: 0,
+    }));
+
+    if (searchQuery) {
+      result = result.filter(payer =>
+        payer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        payer.taxId.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredVendors(result);
+  }, [searchQuery, payers]);
+
+  return (
+    <>
+      {false ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#2C3E50" />
+          <Text className="text-text mt-2">Loading payers...</Text>
+        </View>
+      ) : filteredVendors.length === 0 ? (
+        <View className="flex-1 justify-center items-center">
+          <Feather name="alert-circle" size={50} color="#8896A6" />
+          <Text className="text-text text-lg mt-4">No payers found</Text>
+          <Text className="text-text/70 text-center mt-2">
+            Try adjusting your search or filters to find what you're looking for
+          </Text>
+        </View>
+      ) : (
+        <>
+          <Text className="text-text mb-3">
+            {filteredVendors.length} {filteredVendors.length === 1 ? 'payer' : 'payers'} found
+          </Text>
+          <FlatList
+            data={filteredVendors}
+            keyExtractor={(item) => item.id}
+            renderItem={renderVendorItem}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
+    </>
+  )
+}
+
+const enhance = withObservables([], () => ({
+  payers: payersCollection.query().observe(),
+}));
+
+const EnhancedPayerList = enhance(PayersList);
 
 export default VendorScreen;
