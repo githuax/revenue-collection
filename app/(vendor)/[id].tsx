@@ -6,33 +6,9 @@ import { getPayerByTIN } from '~/services/dbService'
 import Payer from '~/db/model/Payer'
 import Chip from '~/components/Chip'
 import PropertyCard from '~/components/PropertyCard'
-
-const MOCK_PROPERTIES = [
-    {
-        id: '1',
-        name: 'Follow up on Smith & Co. late filing',
-        type: 'Commercial',
-        expiryDate: '2025-06-23',
-        amount: 12500,
-        priority: 'high',
-    },
-    {
-        id: '2',
-        name: 'Review Johnson Property tax assessment',
-        type: 'Residential',
-        expiryDate: '2025-04-24',
-        amount: 8750,
-        priority: 'medium',
-    },
-    {
-        id: '3',
-        name: 'Review Johnson Property tax assessment',
-        type: 'Residential',
-        expiryDate: '2025-05-02',
-        amount: 8750,
-        priority: 'medium',
-    },
-]
+import EnhancedPayments from '~/components/payer_details/payments'
+import EnhancedInvoices from '~/components/payer_details/invoice'
+import EnhancedProperties from '~/components/payer_details/properties'
 
 const MOCK_INVOICES = [
     { id: '1', amount: 100, date: '2023-01-01', status: 'Paid' },
@@ -127,96 +103,15 @@ export default function PayerDetails() {
                     </View>
                 </View>
 
-                 {/* Payments Generated for this Payer */}
-                 <View className='p-4'>
-                    <SectionHeader
-                        title='Payments'
-                        addButtonText='+ Add Payment'
-                        action={() => { 
-                            router.push({
-                                pathname: '/(new_payments)',
-                                params: {
-                                    payerId: payerDetails?.id,
-                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
-                                    payerAddress: payerDetails?.address,
-                                    payerPhone: payerDetails?.phone,
-                                    payerTIN: payerDetails?.tin,
-                                },
-                            });
-                         }}
-                    />
-                    {payments.map((payment) => (
-                        <View key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-                            <Text className='text-text font-semibold'>Payment ID: {payment.id}</Text>
-                            <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
-                            <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
-                            <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
-                        </View>
-                    ))}
-                </View>
+                {/* Payments Owned */}
+                <EnhancedPayments payerDetails={payerDetails} />
 
                 {/* Properties Owned */}
-                <View className='p-4'>
-                    <SectionHeader
-                        title='Properties Owned'
-                        addButtonText='+ Add Property'
-                        action={() => {
-                            router.push({
-                                pathname: '/(property)/add',
-                                params: {
-                                    payerId: payerDetails?.id,
-                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
-                                    payerAddress: payerDetails?.address,
-                                    payerPhone: payerDetails?.phone,
-                                    payerTIN: payerDetails?.tin,
-                                },
-                            });
-                         }}
-                    />
-                    {MOCK_PROPERTIES.map((property) => (
-                        <>
-                            <PropertyCard
-                                key={property.id}
-                                property={{
-                                    id: property.id,
-                                    title: property.name,
-                                    type: property.type,
-                                    expiryDate: property.expiryDate,
-                                    amount: property.amount
-                                }}
-                                onPress={() => { }}
-                            />
-                        </>
-                    ))}
-                </View>
+                <EnhancedProperties payerDetails={payerDetails} />
+                
 
                 {/* Invoices Generated for this Payer */}
-                <View className='p-4'>
-                    <SectionHeader
-                        title='Invoices'
-                        addButtonText='+ Add Invoice'
-                        action={() => { 
-                            router.push({
-                                pathname: '/(new_payments)/invoice',
-                                params: {
-                                    payerId: payerDetails?.id,
-                                    payerName: `${payerDetails?.firstName} ${payerDetails?.lastName}`,
-                                    payerAddress: payerDetails?.address,
-                                    payerPhone: payerDetails?.phone,
-                                    payerTIN: payerDetails?.tin,
-                                },
-                            });
-                         }}
-                    />
-                    {invoices.map((invoice) => (
-                        <View key={invoice.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-                            <Text className='text-text font-semibold'>Invoice ID: {invoice.ref_no}</Text>
-                            <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
-                            <Text className='text-text/70 mt-1'>Date: {invoice.due_date}</Text>
-                            <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
-                        </View>
-                    ))}
-                </View>
+                <EnhancedInvoices payerDetails={payerDetails} />
             </ScrollView>
         </View>
     )
