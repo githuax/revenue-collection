@@ -3,6 +3,7 @@ import React from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function PropertyCard({
+    onPress,
     property
 }) {
     const isPaid = new Date(property.expiryDate) > new Date();
@@ -15,7 +16,7 @@ export default function PropertyCard({
                 isToday && styles.taskPending,
                 !isPaid && !isToday && styles.taskError,
             ]}
-            onPress={() => {/* Navigate to task detail */ }}
+            onPress={onPress}
         >
             <View style={styles.taskHeader}>
                 <View style={[styles.priorityIndicator, 

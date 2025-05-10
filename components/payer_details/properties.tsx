@@ -65,7 +65,9 @@ function Properties({ payerDetails, properties }) {
                             expiryDate: property.expiryDate,
                             amount: property.amount
                         }}
-                        onPress={() => { }}
+                        onPress={() => { 
+                            router.push(`/(property)/${property.id}`);
+                        }}
                     />
                 </>
             ))}

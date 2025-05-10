@@ -26,12 +26,16 @@ function Invoices({ payerDetails, invoices }) {
                 }}
             />
             {invoices.map((invoice) => (
-                <View key={invoice.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
+                <TouchableOpacity key={invoice.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'
+                    onPress={() => {
+                        router.push(`/(invoice)/${invoice.ref_no}`);
+                    }}
+                >
                     <Text className='text-text font-semibold'>Invoice ID: {invoice.ref_no}</Text>
                     <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
                     <Text className='text-text/70 mt-1'>Date: {invoice.due_date}</Text>
                     <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
-                </View>
+                </TouchableOpacity>
             ))}
         </View>
     )

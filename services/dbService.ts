@@ -187,6 +187,25 @@ const getPaymentInfoWithPayerName = async () => {
     return updatedPayments;
 }
 
+const getInvoiceInfoWithPayer = async (ref_no) => {
+    const invoice = await invoicesCollection.query(
+        Q.where('ref_no', ref_no)
+    ).fetch();
+
+    if (invoice.length === 0) {
+        return null;
+    }
+
+    const payer = await payersCollection.query(
+        Q.where('id', invoice[0]._raw.payer_id)
+    ).fetch();
+
+    return {
+        ...invoice[0],
+        payer: payer[0]
+    }
+}
+
 export {
     getPayerByTIN,
     getAllPayers,
@@ -200,5 +219,6 @@ export {
     getAllInvoices,
     getDashboardStats,
     getPaymentInfoWithPayerName,
-    getAllPayments
+    getAllPayments,
+    getInvoiceInfoWithPayer
 }

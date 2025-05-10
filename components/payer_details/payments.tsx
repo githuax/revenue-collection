@@ -26,12 +26,16 @@ function Payments({ payerDetails, payments }) {
                 }}
             />
             {payments.map((payment) => (
-                <View key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
+                <TouchableOpacity key={payment.id} className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'
+                    onPress={() => {
+                        router.push(`/(payment)/${payment.ref_no}`);
+                    }}
+                >
                     <Text className='text-text font-semibold'>Payment ID: {payment.ref_no}</Text>
                     <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
                     <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
                     <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
-                </View>
+                </TouchableOpacity>
             ))}
         </View>
     )
