@@ -14,6 +14,7 @@ export default class PaymentHistory extends Model {
   @field('new_value') newValue
   @field('created_by') createdBy
   @readonly @date('created_datetime') createdDate
+  @field('last_modified_date') lastModifiedDate
 
   @immutableRelation('payments', 'payment_id') payment
 }

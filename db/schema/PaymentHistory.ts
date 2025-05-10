@@ -9,6 +9,7 @@ export const PaymentHistorySchema = tableSchema({
       { name: 'new_value', type: 'string' },
       { name: 'created_by', type: 'string' },
       { name: 'created_datetime', type: 'number' },
+      { name: 'last_modified_date', type: 'number' },
     ],
   })
   

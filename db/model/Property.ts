@@ -14,4 +14,5 @@ export default class Property extends Model {
   @field('notes') notes
   @field('images') images
   @field('owner_id') ownerId
+  @field('last_modified_date') lastModifiedDate
 }

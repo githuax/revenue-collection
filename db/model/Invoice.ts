@@ -14,4 +14,5 @@ export default class Invoice extends Model {
   @field('payer_id') payerId
   @field('property_id') propertyId
   @field('ref_no') ref_no
+  @field('last_modified_date') lastModifiedDate
 }

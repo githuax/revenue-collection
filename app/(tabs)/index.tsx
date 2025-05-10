@@ -9,6 +9,7 @@ import {
 import DashboardActionTiles from '~/components/DashboardActionTiles';
 import DashboardStats from '~/components/DashboardStats';
 import Header from '~/components/Header';
+import syncDb from '~/db/sync';
 import useAuthStore from '~/store/authStore';
 
 const Home = () => {
@@ -22,6 +23,12 @@ const Home = () => {
         text={`Hello ${userData?.first_name}`}
         showBackButton={false}
       />
+
+      <TouchableOpacity className='bg-primary/10 rounded-full px-4 py-2 flex-row items-center mx-4 my-2' onPress={() => {
+        syncDb();
+      }}>
+        <Text className='text-primary font-semibold'>Sync</Text>
+      </TouchableOpacity>
 
       {/* Task Statistics */}
       <DashboardStats />

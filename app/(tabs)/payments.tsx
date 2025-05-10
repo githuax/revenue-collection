@@ -14,10 +14,13 @@ import {
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-import database from '~/db';
+import database, { payersCollection, paymentsCollection } from '~/db';
 import Header from '~/components/Header';
 import SearchBar from '~/components/SearchBar';
 import { getAllPayments, getMyPayments, getPaymentInfoWithPayerName } from '~/services/dbService';
+import { withObservables } from '@nozbe/watermelondb/react';
+import { Q } from '@nozbe/watermelondb';
+import { switchAll,map } from 'rxjs/operators';
 
 // Mock data for payments
 const MOCK_PAYMENTS = [
@@ -32,6 +35,61 @@ const MOCK_PAYMENTS = [
   { id: '9', vendorName: 'Pet Paradise', amount: 540, date: '2025-03-21', status: 'Pending', method: 'Bank Transfer', reference: 'PMT-2025-009' },
   { id: '10', vendorName: 'Hardware Haven', amount: 1100, date: '2025-03-18', status: 'Completed', method: 'Credit Card', reference: 'PMT-2025-010' },
 ];
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'Completed':
+      return { bg: 'bg-success/20', text: 'text-success' };
+    case 'Pending':
+      return { bg: 'bg-warning/20', text: 'text-warning' };
+    case 'Failed':
+      return { bg: 'bg-error/20', text: 'text-error' };
+    default:
+      return { bg: 'bg-gray-200', text: 'text-text' };
+  }
+};
+
+const renderPaymentItem = ({ item }) => {
+  const statusStyle = getStatusColor(item.status);
+
+  return (
+    <TouchableOpacity
+      className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
+      onPress={() => {
+        // handleViewPayment(item)
+      }}
+    >
+      <View className="flex-row justify-between items-start">
+        <View className="flex-1">
+          <Text className="text-text text-lg font-semibold">{item.vendorName}</Text>
+          <Text className="text-text/70 mt-1">Ref: {item.reference}</Text>
+          <Text className="text-text/70 mt-1">{formatDate(item.date)}</Text>
+          <View className="flex-row items-center mt-2">
+            <Text className="text-text/70 mr-2">{item.method}</Text>
+            <View className={`px-2 py-1 rounded-full ${statusStyle.bg}`}>
+              <Text className={`text-xs ${statusStyle.text}`}>{item.status}</Text>
+            </View>
+          </View>
+        </View>
+        <View className="items-end">
+          <Text className="text-primary-dark font-bold">${item.amount.toLocaleString()}</Text>
+          <TouchableOpacity className="mt-2">
+            <Feather name="chevron-right" size={20} color="#2C3E50" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const PaymentRecordScreen = () => {
   const [payments, setPayments] = useState([]);
@@ -58,8 +116,6 @@ const PaymentRecordScreen = () => {
 
   useEffect(() => {
     getPaymentInfoWithPayerName().then(data => {
-      console.log('Fetched payments:', data);
-
       const transformedData = data.map((payment) => ({
         ...payment,
         vendorName: payment.payerName,
@@ -96,28 +152,6 @@ const PaymentRecordScreen = () => {
 
   const filterOptions = ['All', 'Completed', 'Pending', 'Failed'];
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Completed':
-        return { bg: 'bg-success/20', text: 'text-success' };
-      case 'Pending':
-        return { bg: 'bg-warning/20', text: 'text-warning' };
-      case 'Failed':
-        return { bg: 'bg-error/20', text: 'text-error' };
-      default:
-        return { bg: 'bg-gray-200', text: 'text-text' };
-    }
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   const handleViewPayment = (payment) => {
     setSelectedPayment(payment);
     setModalVisible(true);
@@ -150,37 +184,6 @@ const PaymentRecordScreen = () => {
     setPayments(updatedPayments);
     setSelectedPayment(updatedPayment);
     setEditMode(false);
-  };
-
-  const renderPaymentItem = ({ item }) => {
-    const statusStyle = getStatusColor(item.status);
-
-    return (
-      <TouchableOpacity
-        className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
-        onPress={() => handleViewPayment(item)}
-      >
-        <View className="flex-row justify-between items-start">
-          <View className="flex-1">
-            <Text className="text-text text-lg font-semibold">{item.vendorName}</Text>
-            <Text className="text-text/70 mt-1">Ref: {item.reference}</Text>
-            <Text className="text-text/70 mt-1">{formatDate(item.date)}</Text>
-            <View className="flex-row items-center mt-2">
-              <Text className="text-text/70 mr-2">{item.method}</Text>
-              <View className={`px-2 py-1 rounded-full ${statusStyle.bg}`}>
-                <Text className={`text-xs ${statusStyle.text}`}>{item.status}</Text>
-              </View>
-            </View>
-          </View>
-          <View className="items-end">
-            <Text className="text-primary-dark font-bold">${item.amount.toLocaleString()}</Text>
-            <TouchableOpacity className="mt-2">
-              <Feather name="chevron-right" size={20} color="#2C3E50" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   const renderPaymentModal = () => {
@@ -422,37 +425,10 @@ const PaymentRecordScreen = () => {
 
       {/* Payment List */}
       <View className="flex-1 px-4 py-3">
-        {loading ? (
-          <View className="flex-1 justify-center items-center">
-            <ActivityIndicator size="large" color="#2C3E50" />
-            <Text className="text-text mt-2">Loading payment records...</Text>
-          </View>
-        ) : filteredPayments.length === 0 ? (
-          <View className="flex-1 justify-center items-center">
-            <Feather name="alert-circle" size={50} color="#8896A6" />
-            <Text className="text-text text-lg mt-4">No payments found</Text>
-            <Text className="text-text/70 text-center mt-2">
-              Try adjusting your search or filters to find what you're looking for
-            </Text>
-          </View>
-        ) : (
-          <>
-            <View className="flex-row justify-between items-center mb-3">
-              <Text className="text-text">
-                {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'} found
-              </Text>
-              <Text className="text-primary-dark font-bold">
-                Total: ${filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
-              </Text>
-            </View>
-            <FlatList
-              data={filteredPayments}
-              keyExtractor={(item) => item.id}
-              renderItem={renderPaymentItem}
-              showsVerticalScrollIndicator={false}
-            />
-          </>
-        )}
+        <EnhancedPaymentsList
+          searchQuery={searchQuery}
+          payments={filteredPayments}
+          />
       </View>
 
       {/* Add Payment FAB */}
@@ -470,5 +446,96 @@ const PaymentRecordScreen = () => {
     </SafeAreaView>
   );
 };
+
+const PaymentsList = ({
+  searchQuery,
+  payments,
+  payers
+}) => {
+  const [paymentsList, setPaymentsList] = useState(payments);
+  const [filteredPayments, setFilteredPayments] = useState(payments);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    const transformedPayments = payments.map((payment) => ({
+      ...payment,
+      vendorName: payment.payerName || '',
+      amount: payment._raw.amount || 0,
+      date: Date(payment._raw.createdDate).toString(),
+      status: payment._raw.status,
+      method: payment._raw.payment_method,
+      reference: payment._raw.ref_no,
+    }));
+
+    setPaymentsList(transformedPayments);
+    setFilteredPayments(transformedPayments);
+    setLoading(false);
+  }, [payments, payers])
+
+  useEffect(() => {
+    let result = payments
+
+    if (searchQuery) {
+      result = result.filter(payment =>
+        payment.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        payment.reference.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredPayments(result);
+    setLoading(false);
+  }, [searchQuery, payments]);
+
+  return (
+    <>
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#2C3E50" />
+          <Text className="text-text mt-2">Loading payment records...</Text>
+        </View>
+      ) : filteredPayments.length === 0 ? (
+        <View className="flex-1 justify-center items-center">
+          <Feather name="alert-circle" size={50} color="#8896A6" />
+          <Text className="text-text text-lg mt-4">No payments found</Text>
+          <Text className="text-text/70 text-center mt-2">
+            Try adjusting your search or filters to find what you're looking for
+          </Text>
+        </View>
+      ) : (
+        <>
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="text-text">
+              {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'} found
+            </Text>
+            <Text className="text-primary-dark font-bold">
+              Total: ${filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
+            </Text>
+          </View>
+          <FlatList
+            data={filteredPayments}
+            keyExtractor={(item) => item.id}
+            renderItem={renderPaymentItem}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}</>
+  )
+}
+
+const enhance = withObservables([], () => ({
+  payments: paymentsCollection.query().observe(),
+  payers: paymentsCollection.query().observe().pipe(
+   map(payments => {
+    const payerIds = payments.map(payment => payment.payer_id);
+      return payersCollection.query(
+        Q.where('id', Q.oneOf(payerIds)),
+      ).observe(); 
+   }),
+   switchAll()
+  ),
+}));
+
+const EnhancedPaymentsList = enhance(PaymentsList);
 
 export default PaymentRecordScreen;

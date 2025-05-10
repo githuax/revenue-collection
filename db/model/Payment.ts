@@ -16,4 +16,5 @@ export default class Payment extends Model {
   @date('created_date') createdDate
   @field('payer_id') payer_id
   @field('ref_no') ref_no
+  @field('last_modified_date') lastModifiedDate
 }

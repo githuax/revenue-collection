@@ -7,6 +7,7 @@ export const LoginHistorySchema = tableSchema({
       { name: 'date', type: 'number' },
       { name: 'ip_address', type: 'string' },
       { name: 'status', type: 'string' },
+      { name: 'last_modified_date', type: 'number' },
     ],
   })
   

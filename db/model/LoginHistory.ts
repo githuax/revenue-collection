@@ -7,6 +7,7 @@ export default class LoginHistory extends Model {
   @field('date') date
   @field('ip_address') ipAddress
   @field('status') status
+  @field('last_modified_date') lastModifiedDate
 
   @relation('users', 'user_id') user
 }

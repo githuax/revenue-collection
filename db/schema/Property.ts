@@ -12,6 +12,7 @@ export const PropertySchema = tableSchema({
       { name: 'type', type: 'string' },
       { name: 'notes', type: 'string' },
       { name: 'images', type: 'string' },
+      { name: 'last_modified_date', type: 'number' },
     ],
   })
   
