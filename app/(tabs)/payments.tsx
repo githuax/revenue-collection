@@ -20,7 +20,7 @@ import SearchBar from '~/components/SearchBar';
 import { getAllPayments, getMyPayments, getPaymentInfoWithPayerName } from '~/services/dbService';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { Q } from '@nozbe/watermelondb';
-import { switchAll,map } from 'rxjs/operators';
+import { switchAll, map } from 'rxjs/operators';
 
 // Mock data for payments
 const MOCK_PAYMENTS = [
@@ -65,7 +65,7 @@ const renderPaymentItem = ({ item }) => {
     <TouchableOpacity
       className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
       onPress={() => {
-        // handleViewPayment(item)
+        router.push(`/(payment)/${item.ref_no}`);
       }}
     >
       <View className="flex-row justify-between items-start">
@@ -428,7 +428,7 @@ const PaymentRecordScreen = () => {
         <EnhancedPaymentsList
           searchQuery={searchQuery}
           payments={filteredPayments}
-          />
+        />
       </View>
 
       {/* Add Payment FAB */}
@@ -457,16 +457,20 @@ const PaymentsList = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const transformedPayments = payments.map((payment) => {
+      const payer = payers.find(p => p.id === payment.payer_id);
+      const payerName = payer ? `${payer.firstName} ${payer.lastName}` : 'Unknown Payer';
 
-    const transformedPayments = payments.map((payment) => ({
-      ...payment,
-      vendorName: payment.payerName || '',
-      amount: payment._raw.amount || 0,
-      date: Date(payment._raw.createdDate).toString(),
-      status: payment._raw.status,
-      method: payment._raw.payment_method,
-      reference: payment._raw.ref_no,
-    }));
+      return {
+        ...payment,
+        vendorName: payerName,
+        amount: payment._raw.amount || 0,
+        date: Date(payment._raw.createdDate).toString(),
+        status: payment._raw.status,
+        method: payment._raw.payment_method,
+        reference: payment._raw.ref_no,
+      }
+    });
 
     setPaymentsList(transformedPayments);
     setFilteredPayments(transformedPayments);
@@ -474,7 +478,7 @@ const PaymentsList = ({
   }, [payments, payers])
 
   useEffect(() => {
-    let result = payments
+    let result = paymentsList;
 
     if (searchQuery) {
       result = result.filter(payment =>
@@ -485,7 +489,7 @@ const PaymentsList = ({
 
     setFilteredPayments(result);
     setLoading(false);
-  }, [searchQuery, payments]);
+  }, [searchQuery, paymentsList]);
 
   return (
     <>
@@ -526,13 +530,13 @@ const PaymentsList = ({
 const enhance = withObservables([], () => ({
   payments: paymentsCollection.query().observe(),
   payers: paymentsCollection.query().observe().pipe(
-   map(payments => {
-    const payerIds = payments.map(payment => payment.payer_id);
+    map(payments => {
+      const payerIds = payments.map(payment => payment.payer_id);
       return payersCollection.query(
         Q.where('id', Q.oneOf(payerIds)),
-      ).observe(); 
-   }),
-   switchAll()
+      ).observe();
+    }),
+    switchAll()
   ),
 }));
 
