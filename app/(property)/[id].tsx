@@ -1,7 +1,7 @@
 import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Share } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
-import database from '../../db'
+import database, { propertiesCollection } from '../../db'
 import Property from '../../db/model/Property'
 import Payer from '../../db/model/Payer'
 import { Ionicons, Feather } from '@expo/vector-icons'
@@ -10,9 +10,10 @@ import ReferenceNumber from '~/components/ReferenceNumber'
 import SelectPayer from '~/components/SelectPayer'
 import DropdownComponent from '~/components/DropDown'
 import { PROPERTY_TYPES } from '~/services/constants'
+import { Q } from '@nozbe/watermelondb'
 
 export default function PropertyDisplayScreen() {
-  const { propertyId } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [property, setProperty] = useState(null);
@@ -39,12 +40,14 @@ export default function PropertyDisplayScreen() {
   // Fetch property data
   useEffect(() => {
     fetchPropertyData();
-  }, [propertyId]);
+  }, [id]);
 
   const fetchPropertyData = async () => {
     try {
       setIsLoading(true);
-      const propertyRecord = await database.get<Property>('properties').find(propertyId);
+      const propertyRecord = await propertiesCollection.query(
+        Q.where('property_ref_no', id)
+      ).fetch().then(records => records[0]);
       
       if (propertyRecord) {
         setProperty(propertyRecord);
@@ -105,7 +108,7 @@ export default function PropertyDisplayScreen() {
 
     try {
       await database.write(async () => {
-        const propertyToUpdate = await database.get<Property>('properties').find(propertyId);
+        const propertyToUpdate = await database.get<Property>('properties').find(id);
         
         await propertyToUpdate.update(property => {
           property.propertyRefNo = propertyData.property_ref_no;
@@ -118,6 +121,7 @@ export default function PropertyDisplayScreen() {
           property.notes = propertyData.notes;
           property.images = propertyData.images;
           property.ownerId = propertyData.payer.id;
+          property.lastModifiedDate = Date.now();
         });
       });
 
@@ -153,7 +157,7 @@ export default function PropertyDisplayScreen() {
           onPress: async () => {
             try {
               await database.write(async () => {
-                const propertyToDelete = await database.get<Property>('properties').find(propertyId);
+                const propertyToDelete = await database.get<Property>('properties').find(id);
                 await propertyToDelete.destroyPermanently();
               });
               

@@ -32,7 +32,10 @@
             "extraPods": [
               {
                 "name": "simdjson",
-                "configurations": ["Debug", "Release"],
+                "configurations": [
+                  "Debug",
+                  "Release"
+                ],
                 "path": "../node_modules/@nozbe/simdjson",
                 "modular_headers": true
               }
@@ -70,6 +73,14 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.fireblaze1234.caltrac"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e759be5c-d24c-4736-8ff6-f8fd5bba98a0"
+      }
     }
   }
 }

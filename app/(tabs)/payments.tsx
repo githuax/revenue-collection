@@ -65,7 +65,7 @@ const renderPaymentItem = ({ item }) => {
     <TouchableOpacity
       className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100"
       onPress={() => {
-        router.push(`/(payment)/${item.ref_no}`);
+        router.push(`/(payment)/${item.reference}`);
       }}
     >
       <View className="flex-row justify-between items-start">

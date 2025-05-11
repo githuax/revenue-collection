@@ -54,15 +54,15 @@ function Properties({ payerDetails, properties }) {
                     });
                 }}
             />
-            {MOCK_PROPERTIES.map((property) => (
+            {properties.map((property) => (
                 <>
                     <PropertyCard
-                        key={property.id}
+                        key={property.property_ref_no}
                         property={{
-                            id: property.id,
-                            title: property.name,
+                            id: property.propertyRefNo,
+                            title: property.propertyRefNo,
                             type: property.type,
-                            expiryDate: property.expiryDate,
+                            expiryDate: property.paymentExpiryDate,
                             amount: property.amount
                         }}
                         onPress={() => { 

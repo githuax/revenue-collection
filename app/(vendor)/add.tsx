@@ -250,7 +250,7 @@ export default function Add() {
             message="The payer has been added successfully."
             onClose={() => {
               setSuccessModalVisible(false);
-              router.back();
+              router.push(`/(vendor)/${tin}`)
             }}
             autoCloseTime={5000} // Auto close after 5 seconds
           />

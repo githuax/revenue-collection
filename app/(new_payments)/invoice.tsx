@@ -180,7 +180,7 @@ const NewInvoiceScreen = () => {
                                     prefix="INV"
                                     value={reference}
                                     onChange={setReference}
-                                    editable={false}
+                                    editable={true}
                                     className="bg-gray-100"
                                 />
                                 <Text className="text-xs text-gray-500 ml-1 mt-1">Auto-generated unique payment reference</Text>

@@ -108,7 +108,6 @@ export default function PayerDetails() {
 
                 {/* Properties Owned */}
                 <EnhancedProperties payerDetails={payerDetails} />
-                
 
                 {/* Invoices Generated for this Payer */}
                 <EnhancedInvoices payerDetails={payerDetails} />

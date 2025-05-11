@@ -38,9 +38,10 @@ const ReferenceNumber: React.FC<ReferenceNumberProps> = ({
         className={`bg-gray-200 py-3 px-4 rounded-lg border border-gray-300 text-text w-[85%] ${className}`}
         value={value}
         onChangeText={onChange}
-        editable={editable}
+        editable={false}
       />
       <TouchableOpacity
+        disabled={!editable}
         className="bg-primary/10 p-3 rounded-lg"
         onPress={generateReference}
       >

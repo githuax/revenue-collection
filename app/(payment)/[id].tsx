@@ -17,7 +17,7 @@ import { Feather } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 
-import database from '~/db';
+import database, { payersCollection, paymentsCollection } from '~/db';
 import Payment from '~/db/model/Payment';
 import SelectPayer from '~/components/SelectPayer';
 import { DB_SYNC_STATUS, PAYMENT_METHODS } from '~/services/constants';
@@ -27,14 +27,15 @@ import DatePicker from '~/components/DatePicker';
 import ReferenceNumber from '~/components/ReferenceNumber';
 import SelectInvoice from '~/components/SelectInvoice';
 import useAuthStore from '~/store/authStore';
+import { Q } from '@nozbe/watermelondb';
 
 const PaymentDisplayScreen = () => {
-  const { paymentId } = useLocalSearchParams();
+  const { id } = useLocalSearchParams();
   const [payment, setPayment] = useState(null);
   const [payer, setPayer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // Editable fields
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [invoice, setInvoice] = useState(null);
@@ -55,20 +56,28 @@ const PaymentDisplayScreen = () => {
   // Fetch payment data
   useEffect(() => {
     fetchPaymentData();
-  }, [paymentId]);
+  }, [id]);
 
   const fetchPaymentData = async () => {
     try {
       setIsLoading(true);
-      const paymentRecord = await database.get<Payment>('payments').find(paymentId);
-      
+      let paymentRecord = await paymentsCollection.query(
+        Q.where('ref_no', id)
+      ).fetch();
+      paymentRecord = paymentRecord[0];
+
       if (paymentRecord) {
         setPayment(paymentRecord);
-        
+
         // Get payer info
-        const payerRecord = await database.get('payers').find(paymentRecord.payer_id);
+        let payerRecord = await payersCollection.query(
+          Q.where('id', paymentRecord.payer_id)
+        ).fetch();
+
+        payerRecord = payerRecord[0];
+
         setPayer(payerRecord);
-        
+
         // Set form fields for potential editing
         setSelectedVendor({
           value: payerRecord.id,
@@ -78,20 +87,20 @@ const PaymentDisplayScreen = () => {
           phoneNumber: payerRecord.phoneNumber,
           tpin: payerRecord.tpin,
         });
-        
+
         setInvoice(paymentRecord.invoice);
         setAmount(paymentRecord.amount.toString());
         setReference(paymentRecord.ref_no);
         setPaymentMethod(paymentRecord.paymentMethod);
         setDescription(paymentRecord.notes);
-        
+
         if (paymentRecord.location) {
           setLocation(paymentRecord.location);
           getAddressFromCoordinates(paymentRecord.location);
         }
       } else {
         Alert.alert('Error', 'Payment not found');
-        router.back();
+        // router.back();
       }
     } catch (error) {
       console.error('Error fetching payment:', error);
@@ -121,7 +130,7 @@ const PaymentDisplayScreen = () => {
   // Get current location
   const getLocation = async () => {
     if (!isEditing) return;
-    
+
     setLocationLoading(true);
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -185,7 +194,7 @@ const PaymentDisplayScreen = () => {
     try {
       await database.write(async () => {
         const paymentToUpdate = await database.get<Payment>('payments').find(paymentId);
-        
+
         await paymentToUpdate.update(payment => {
           payment.amount = parseFloat(amount);
           payment.paymentMethod = paymentMethod;
@@ -194,6 +203,7 @@ const PaymentDisplayScreen = () => {
           payment.payer_id = selectedVendor.id;
           payment.status = DB_SYNC_STATUS.PENDING;
           payment.notes = description;
+          payment.lastModifiedDate = Date.now();
         });
       });
 
@@ -224,8 +234,8 @@ const PaymentDisplayScreen = () => {
       'Are you sure you want to delete this payment?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
+        {
+          text: 'Delete',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -233,7 +243,7 @@ const PaymentDisplayScreen = () => {
                 const paymentToDelete = await database.get<Payment>('payments').find(paymentId);
                 await paymentToDelete.destroyPermanently();
               });
-              
+
               Alert.alert('Success', 'Payment deleted successfully');
               router.back();
             } catch (error) {
@@ -249,7 +259,7 @@ const PaymentDisplayScreen = () => {
   // Share payment details
   const sharePayment = async () => {
     if (!payment || !payer) return;
-    
+
     try {
       await Share.share({
         message: `Payment Details\n\nRef: ${payment.ref_no}\nAmount: $${payment.amount}\nPaid to: ${payer.name}\nMethod: ${payment.paymentMethod}\nDate: ${formatDateTime(payment.createdDate)}\n${payment.notes ? `Notes: ${payment.notes}` : ''}`
@@ -273,28 +283,6 @@ const PaymentDisplayScreen = () => {
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
       <Header
         text={isEditing ? "Edit Payment" : "Payment Details"}
-        className="border-b border-gray-200 shadow-sm"
-        leftComponent={
-          <TouchableOpacity onPress={() => router.back()} className="p-2">
-            <Feather name="arrow-left" size={24} color="#2C3E50" />
-          </TouchableOpacity>
-        }
-        rightComponent={
-          isEditing ? (
-            <TouchableOpacity onPress={() => setIsEditing(false)} className="p-2">
-              <Feather name="x" size={24} color="#2C3E50" />
-            </TouchableOpacity>
-          ) : (
-            <View className="flex-row">
-              <TouchableOpacity onPress={sharePayment} className="p-2 mr-2">
-                <Feather name="share-2" size={24} color="#2C3E50" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setIsEditing(true)} className="p-2">
-                <Feather name="edit" size={24} color="#2C3E50" />
-              </TouchableOpacity>
-            </View>
-          )
-        }
       />
 
       <KeyboardAvoidingView
@@ -342,12 +330,12 @@ const PaymentDisplayScreen = () => {
               {(payer || selectedVendor) && (
                 <View className="bg-blue-50 p-4 rounded-xl mt-3 border border-blue-200">
                   <Text className="text-blue-700 font-bold text-base">
-                    {isEditing ? selectedVendor?.name : payer?.name}
+                    {isEditing ? selectedVendor?.name : payer?.firstName + ' ' + payer?.lastName}
                   </Text>
                   <View className="flex-row items-center mt-2">
                     <Feather name="credit-card" size={14} color="#4B5563" />
                     <Text className="text-gray-600 ml-2">
-                      TPIN: {isEditing ? selectedVendor?.tpin : payer?.tpin}
+                      TPIN: {isEditing ? selectedVendor?.tpin : payer?.tin}
                     </Text>
                   </View>
                   <View className="flex-row items-center mt-1">
@@ -359,7 +347,7 @@ const PaymentDisplayScreen = () => {
                   <View className="flex-row items-center mt-1">
                     <Feather name="phone" size={14} color="#4B5563" />
                     <Text className="text-gray-600 ml-2">
-                      {isEditing ? selectedVendor?.phoneNumber : payer?.phoneNumber}
+                      {isEditing ? selectedVendor?.phoneNumber : payer?.phone}
                     </Text>
                   </View>
                 </View>
@@ -376,20 +364,13 @@ const PaymentDisplayScreen = () => {
               {/* Reference Number */}
               <View className="mb-5">
                 <Text className="text-gray-700 font-semibold mb-2">Reference Number</Text>
-                {isEditing ? (
-                  <ReferenceNumber
-                    prefix="PMT"
-                    value={reference}
-                    onChange={setReference}
-                    editable={false}
-                    className="bg-gray-100"
-                  />
-                ) : (
-                  <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 py-3">
-                    <Feather name="hash" size={20} color="#4B5563" />
-                    <Text className="text-gray-700 ml-3 font-medium">{payment?.ref_no}</Text>
-                  </View>
-                )}
+                <ReferenceNumber
+                  prefix="PMT"
+                  value={reference}
+                  onChange={setReference}
+                  editable={false}
+                  className="bg-gray-100"
+                />
               </View>
 
               {/* Amount */}
@@ -490,7 +471,7 @@ const PaymentDisplayScreen = () => {
                     <Text className="text-gray-700 ml-3">{locationText}</Text>
                   </View>
                 )}
-                
+
                 {location && (
                   <View className="flex-row items-center mt-2">
                     <Feather name="info" size={14} color="#4B5563" />
@@ -531,28 +512,28 @@ const PaymentDisplayScreen = () => {
 
             {/* Action Buttons */}
             {isEditing ? (
-              <View className="flex-row space-x-4 mb-8">
+              <TouchableOpacity
+                className="bg-blue-600 py-4 rounded-xl items-center shadow-md mb-4"
+                onPress={handleUpdatePayment}
+              >
+                <View className="flex-row items-center justify-center space-x-2">
+                  <Feather name="save" size={24} color="white" />
+                  <Text className="text-white font-bold text-lg ml-2">Save Changes</Text>
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <View className="flex-row space-x-3">
                 <TouchableOpacity
-                  className="bg-red-500 rounded-xl p-4 flex-1 shadow-md"
-                  onPress={handleDeletePayment}
+                  className="flex-1 bg-blue-600 py-4 rounded-xl items-center shadow-md mb-4"
+                  onPress={() => setIsEditing(true)}
                 >
                   <View className="flex-row items-center justify-center">
-                    <Feather name="trash-2" size={20} color="white" />
-                    <Text className="text-white font-bold text-base ml-2">Delete</Text>
-                  </View>
-                </TouchableOpacity>
-                
-                <TouchableOpacity
-                  className="bg-blue-600 rounded-xl p-4 flex-1 shadow-md"
-                  onPress={handleUpdatePayment}
-                >
-                  <View className="flex-row items-center justify-center">
-                    <Feather name="check" size={20} color="white" />
-                    <Text className="text-white font-bold text-base ml-2">Save Changes</Text>
+                    <Feather name="edit-2" size={20} color="white" />
+                    <Text className="text-white font-bold text-base ml-2">Edit</Text>
                   </View>
                 </TouchableOpacity>
               </View>
-            ) : null}
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -10,6 +10,7 @@ import ReferenceNumber from '~/components/ReferenceNumber'
 import SelectPayer from '~/components/SelectPayer'
 import DropdownComponent from '~/components/DropDown'
 import { PROPERTY_TYPES } from '~/services/constants'
+import StatusModal from '~/components/modals/Status'
 
 export default function Add() {
   const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
@@ -18,6 +19,9 @@ export default function Add() {
     label: type,
     value: type,
   }))
+
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
 
   const [propertyData, setPropertyData] = useState({
     property_ref_no: null,
@@ -41,7 +45,7 @@ export default function Add() {
   const handleSubmit = async () => {
     try {
       const propertiesCollection = database.collections.get<Property>('properties')
-      
+
       await database.write(async () => {
         await propertiesCollection.create((property: Property) => {
           property.propertyRefNo = propertyData.property_ref_no
@@ -56,8 +60,9 @@ export default function Add() {
           property.lastModifiedDate = Date.now();
         })
       })
-      router.back()
+      setSuccessModalVisible(true);
     } catch (error) {
+      setErrorModalVisible(true);
       console.error('Error creating property:', error)
     }
   }
@@ -86,7 +91,7 @@ export default function Add() {
                 prefix="PROP"
                 value={propertyData.property_ref_no}
                 onChange={(text) => setPropertyData({ ...propertyData, property_ref_no: text })}
-                editable={false}
+                editable={true}
                 className="bg-gray-100" // Added background color
               />
             </View>
@@ -198,14 +203,14 @@ export default function Add() {
             {/* Property Type with Radio Options */}
             <View className="mb-5">
               <Text className="text-gray-700 font-semibold mb-2 text-base">Property Type</Text>
-              <DropdownComponent 
-                  data={transformedPropertyTypes}
-                  onChange={(value) => setPropertyData({ ...propertyData, type: value })}
-                  placeholder="Select Type"
-                  isSearchable={false}
-                  initialValue={propertyData.type}
-                  leftIcon={<Ionicons name="business-outline" size={20} color="#4B5563" className='mr-3'/>}
-                />
+              <DropdownComponent
+                data={transformedPropertyTypes}
+                onChange={(value) => setPropertyData({ ...propertyData, type: value })}
+                placeholder="Select Type"
+                isSearchable={false}
+                initialValue={propertyData.type}
+                leftIcon={<Ionicons name="business-outline" size={20} color="#4B5563" className='mr-3' />}
+              />
             </View>
 
             {/* Notes */}
@@ -250,6 +255,28 @@ export default function Add() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {/* Success Modal */}
+      <StatusModal
+        visible={successModalVisible}
+        type="success"
+        title="Property Added Successfully!"
+        message="The property has been added successfully."
+        onClose={() => {
+          setSuccessModalVisible(false);
+          router.push(`/(property)/${propertyData.property_ref_no}`)
+        }}
+        autoCloseTime={5000} // Auto close after 5 seconds
+      />
+
+      {/* Error Modal */}
+      <StatusModal
+        visible={errorModalVisible}
+        type="error"
+        title="Property Creation Failed"
+        message="We couldn't process your payment. Please check your property details and try again."
+        onClose={() => setErrorModalVisible(false)}
+        autoCloseTime={0} // Don't auto close error modals
+      />
     </SafeAreaView>
   )
 }
