@@ -78,6 +78,7 @@ const NewInvoiceScreen = () => {
                 invoice.status = INVOICE_STATUS.UNPAID;
                 invoice.notes = description;
                 invoice.ref_no = reference;
+                invoice.lastModifiedDate = Date.now();
             })
         }).then(() => {
             setSuccessModalVisible(true);

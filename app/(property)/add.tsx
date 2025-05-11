@@ -53,6 +53,7 @@ export default function Add() {
           property.notes = propertyData.notes
           property.images = propertyData.images
           property.ownerId = propertyData.payer.id
+          property.lastModifiedDate = Date.now();
         })
       })
       router.back()

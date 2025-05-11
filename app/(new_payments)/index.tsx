@@ -124,6 +124,7 @@ const NewPaymentScreen = () => {
         payment.createdDate = new Date();
         payment.notes = description;
         payment.ref_no = reference;
+        payment.lastModifiedDate = Date.now();
       })
     }).then(() => {
 

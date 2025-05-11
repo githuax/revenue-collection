@@ -49,6 +49,7 @@ export default function Add() {
         payer.vendor = isVendor;
         payer.businessType = selectedBusinessTypes;
         payer.createdBy = useAuthStore.getState().userData?.id;
+        payer.updatedAt = Date.now();
       })
     }).then(() => {
       setSuccessModalVisible(true);
