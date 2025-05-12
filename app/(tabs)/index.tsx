@@ -4,8 +4,13 @@ import {
   StatusBar,
   View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView
 } from 'react-native';
+import PaymentsMonth from '~/components/dashboard/payments_month';
+import PaymentsToday from '~/components/dashboard/payments_today';
+import PaymentsWeek from '~/components/dashboard/payments_week';
+import RecentPayments from '~/components/dashboard/recent_payments';
 import DashboardActionTiles from '~/components/DashboardActionTiles';
 import DashboardStats from '~/components/DashboardStats';
 import Header from '~/components/Header';
@@ -18,6 +23,7 @@ const Home = () => {
   return (
     <SafeAreaView className='flex-1 bg-background'>
       <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
+      <ScrollView>
       {/* Header */}
       <Header 
         text={`Hello ${userData?.first_name}`}
@@ -31,10 +37,22 @@ const Home = () => {
       </TouchableOpacity>
 
       {/* Task Statistics */}
-      <DashboardStats />
+      {/* <DashboardStats /> */}
       
       {/* Quick Actions */}
       <DashboardActionTiles />
+
+      {/* Recent Payments */}
+      <RecentPayments />
+
+      <PaymentsToday />
+
+      <View className='flex-row justify-between items-center px-4 py-2'>
+        <PaymentsWeek />
+        <PaymentsMonth />
+      </View>
+
+      </ScrollView>
 
       {/* <View>
         <View className='flex-row justify-between items-center px-4 py-2'>

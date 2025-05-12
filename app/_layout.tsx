@@ -1,4 +1,6 @@
 
+import "react-native-reanimated"
+
 import { SafeAreaView, StatusBar } from 'react-native';
 import '../global.css';
 import { Stack } from "expo-router";
