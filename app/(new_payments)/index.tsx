@@ -28,6 +28,7 @@ import DatePicker from '~/components/DatePicker';
 import ReferenceNumber from '~/components/ReferenceNumber';
 import SelectInvoice from '~/components/SelectInvoice';
 import useAuthStore from '~/store/authStore';
+import StatusModal from '~/components/modals/Status';
 
 const NewPaymentScreen = () => {
   const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
@@ -53,6 +54,8 @@ const NewPaymentScreen = () => {
   const [location, setLocation] = useState(null);
   const [locationText, setLocationText] = useState('Get current location');
   const [locationLoading, setLocationLoading] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
 
   const modifiedPaymentMethods = PAYMENT_METHODS.map(method => ({
     label: method,
@@ -116,7 +119,7 @@ const NewPaymentScreen = () => {
       const payment = await database.get<Payment>('payments').create(payment => {
         payment.amount = parseFloat(amount);
         payment.paymentMethod = paymentMethod;
-        payment.location = location
+        payment.location = locationText;
         payment.invoice = invoice;
         payment.payer_id = selectedVendor.id;
         payment.status = DB_SYNC_STATUS.PENDING;
@@ -128,22 +131,23 @@ const NewPaymentScreen = () => {
       })
     }).then(() => {
 
-      // Show success message
-      Alert.alert(
-        'Payment Recorded',
-        `Payment of $${amount} to has been recorded successfully.`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              router.back()
-            }
-          }
-        ]
-      );
+      // // Show success message
+      // Alert.alert(
+      //   'Payment Recorded',
+      //   `Payment of $${amount} to has been recorded successfully.`,
+      //   [
+      //     {
+      //       text: 'OK',
+      //       onPress: () => {
+      //         router.back()
+      //       }
+      //     }
+      //   ]
+      // );
+      setSuccessModalVisible(true);
     }).catch((error) => {
       console.error('Error saving payment:', error);
-      Alert.alert('Error', 'Failed to record payment');
+      setErrorModalVisible(true);
     })
   };
 
@@ -245,29 +249,6 @@ const NewPaymentScreen = () => {
                 <Text className="text-xs text-gray-500 ml-1 mt-1">Auto-generated unique payment reference</Text>
               </View>
 
-              {/* Due Date */}
-              {/* <View className="mb-5">
-                <Text className="text-gray-700 font-semibold mb-2">Due Date</Text>
-                <View className="flex-row justify-between items-center">
-                  <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4 py-3 flex-1 mr-2">
-                    <Feather name="calendar" size={20} color="#4B5563" />
-                    <Text className="text-gray-700 ml-3">{formatDate(date)}</Text>
-                  </View>
-                  <DatePicker
-                    activator={({ openPicker }) => (
-                      <TouchableOpacity
-                        onPress={openPicker}
-                        className="bg-blue-100 rounded-xl w-12 h-12 flex-row items-center justify-center"
-                      >
-                        <Feather name="calendar" size={24} color="#3B82F6" />
-                      </TouchableOpacity>
-                    )}
-                    onChange={setDate}
-                    selectedDate={date}
-                  />
-                </View>
-              </View> */}
-
               {/* Payment Method */}
               <View className="mb-5">
                 <Text className="text-gray-700 font-semibold mb-2">Payment Method</Text>
@@ -358,6 +339,28 @@ const NewPaymentScreen = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+         {/* Success Modal */}
+            <StatusModal
+                visible={successModalVisible}
+                type="success"
+                title="Payment Added Successfully!"
+                message="The payment has been added successfully."
+                onClose={() => {
+                    setSuccessModalVisible(false);
+                    router.replace(`/(payment)/${reference}`)
+                }}
+                autoCloseTime={5000} // Auto close after 5 seconds
+            />
+
+            {/* Error Modal */}
+            <StatusModal
+                visible={errorModalVisible}
+                type="error"
+                title="Payment Addition Failed"
+                message="There was an error while creating the payment record. Please Try again."
+                onClose={() => setErrorModalVisible(false)}
+                autoCloseTime={0} // Don't auto close error modals
+            />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

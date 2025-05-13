@@ -193,7 +193,9 @@ const PaymentDisplayScreen = () => {
 
     try {
       await database.write(async () => {
-        const paymentToUpdate = await database.get<Payment>('payments').find(paymentId);
+        const paymentToUpdate = await database.get<Payment>('payments').query(
+          Q.where('ref_no', id)
+        ).fetch().then(records => records[0]);
 
         await paymentToUpdate.update(payment => {
           payment.amount = parseFloat(amount);

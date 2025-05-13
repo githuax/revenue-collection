@@ -19,6 +19,7 @@ export default class Payer extends Model {
   @field('last_modified_by') lastModifiedBy
   @date('created_datetime') createdAt
   @date('last_modified_date') updatedAt
+  @field('location') location
 
   get toObject() {
     return {

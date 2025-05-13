@@ -203,7 +203,9 @@ const PayersList = ({
 }
 
 const enhance = withObservables([], () => ({
-  payers: payersCollection.query().observe(),
+  payers: payersCollection.query().observeWithColumns(
+    payersCollection.schema.columnArray.map((column) => column.name),
+  ),
 }));
 
 const EnhancedPayerList = enhance(PayersList);

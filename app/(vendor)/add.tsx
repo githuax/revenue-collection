@@ -34,7 +34,7 @@ export default function Add() {
   }));
 
   const handleBusinessTypeChange = (selectedValues: string[]) => {
-    setSelectedBusinessTypes(selectedValues);
+    setSelectedBusinessTypes(selectedValues[0]);
   };
 
   const addPayer = () => {
@@ -50,6 +50,7 @@ export default function Add() {
         payer.businessType = selectedBusinessTypes;
         payer.createdBy = useAuthStore.getState().userData?.id;
         payer.updatedAt = Date.now();
+        payer.location = location;
       })
     }).then(() => {
       setSuccessModalVisible(true);
@@ -259,8 +260,8 @@ export default function Add() {
           <StatusModal
             visible={errorModalVisible}
             type="error"
-            title="Payment Failed"
-            message="We couldn't process your payment. Please check your payment details and try again."
+            title="Add Payer Failed"
+            message="Payer couldn't be added. Please check your payer details and try again."
             onClose={() => setErrorModalVisible(false)}
             autoCloseTime={0} // Don't auto close error modals
           />

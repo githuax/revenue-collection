@@ -18,5 +18,6 @@ export const PayerSchema = tableSchema({
     { name: 'created_datetime', type: 'number' },
     { name: 'last_modified_by', type: 'string' },
     { name: 'last_modified_date', type: 'number' },
+    { name: 'location', type: 'string' },
   ],
 })

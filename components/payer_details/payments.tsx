@@ -44,6 +44,8 @@ function Payments({ payerDetails, payments }) {
 const enhance = withObservables(['payerDetails'], ({ payerDetails }) => ({
     payments: paymentsCollection.query(
         Q.where('payer_id', payerDetails.id),
+    ).observeWithColumns(
+        paymentsCollection.schema.columnArray.map((column) => column.name),
     ),
 }));
 

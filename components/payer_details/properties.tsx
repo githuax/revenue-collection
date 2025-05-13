@@ -78,7 +78,9 @@ function Properties({ payerDetails, properties }) {
 const enhance = withObservables(['payerDetails'], ({ payerDetails }) => ({
     properties: propertiesCollection.query(
         Q.where('owner_id', payerDetails.id),
-    ),
+    ).observeWithColumns(
+        propertiesCollection.schema.columnArray.map((column) => column.name)
+    )
 }));
 
 const EnhancedProperties = enhance(Properties);

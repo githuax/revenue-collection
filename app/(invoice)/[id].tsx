@@ -56,28 +56,28 @@ const InvoiceDetailScreen = () => {
             // Fetch the invoice by ID
             const invoiceRecord = await invoicesCollection.query(
                 Q.where('ref_no', id)
-            ).fetch();
+            ).fetch().then(records => records[0]);
             setInvoice(invoiceRecord);
             
             // Get the payer information (you'll need to implement or modify this part based on your data structure)
             const payer = await payersCollection.query(
                 Q.where('id', invoiceRecord.payerId)
-            ).fetch();
+            ).fetch().then(records => records[0]);
             if (payer.length === 0) {
                 Alert.alert("Error", "Payer not found");
                 setIsLoading(false);
                 return;
             }
-            const payerData = payer[0];
+            const payerData = payer;
             
             // Populate form data
             setSelectedVendor({
                 value: payerData.id,
                 id: payerData.id,
-                name: payerData.name,
-                address: payerData.address,
-                phoneNumber: payerData.phoneNumber,
-                tpin: payerData.tpin,
+                name: payerData.firstName + ' ' + payerData.lastName,
+                address: payerData.businessType,
+                phoneNumber: payerData.phone,
+                tpin: payerData.tin,
             });
             
             setAmount(invoiceRecord.amountDue.toString());

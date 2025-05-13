@@ -528,7 +528,9 @@ const PaymentsList = ({
 }
 
 const enhance = withObservables([], () => ({
-  payments: paymentsCollection.query().observe(),
+  payments: paymentsCollection.query().observeWithColumns(
+    paymentsCollection.schema.columnArray.map(c => c.name),
+  ),
   payers: paymentsCollection.query().observe().pipe(
     map(payments => {
       const payerIds = payments.map(payment => payment.payer_id);

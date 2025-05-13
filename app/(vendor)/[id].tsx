@@ -24,25 +24,10 @@ const MOCK_PAYMENTS = [
     { id: '5', amount: 500, date: '2023-05-01', status: 'Pending' },
 ]
 
-const SectionHeader = ({ title, addButtonText, action }: { title: string, addButtonText: string, action: Function}) => {
-    return (
-        <View className='flex-row items-center justify-between mb-4'>
-            <Text className='text-text text-xl'>{title}</Text>
-            <TouchableOpacity className='bg-primary/10 rounded-full px-4 py-2 flex-row items-center' onPress={() => action()}>
-                {/* Add a New Property */}
-                <Text className='text-primary font-semibold'>{addButtonText}</Text>
-            </TouchableOpacity>
-        </View>
-    )
-}
-
 export default function PayerDetails() {
     const localParams = useLocalSearchParams();
 
     const [payerDetails, setPayerDetails] = useState<Payer>(undefined);
-    const [properties, setProperties] = useState([]);
-    const [invoices, setInvoices] = useState([]);
-    const [payments, setPayments] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -70,11 +55,6 @@ export default function PayerDetails() {
                     created_date: createdDate
                 }
             })
-
-            setProperties(data.properties);
-            setInvoices(updatedInvoice);
-            setPayments(updatedPayments);
-
 
             setIsLoading(false);
         })
