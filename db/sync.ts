@@ -6,9 +6,8 @@ const syncDb = async () => {
     await synchronize({
         database,
         pullChanges: async ({ lastPulledAt, schemaVersion, migration }) => {
-
             const { data, error } = await supabase.rpc('pull_data', {
-                last_pulled_at: lastPulledAt,
+                last_pulled_at: lastPulledAt || 0,
             })
 
             if (error) {

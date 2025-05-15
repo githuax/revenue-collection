@@ -26,24 +26,6 @@ function RecentPaymentsComponent({
     return (
         <View className='px-4 py-2'>
             <Text className='text-lg font-bold tracking-wider'>Recent Payments</Text>
-            {/* <FlatList
-                data={payments}
-                renderItem={({ item }) => (
-                    <RenderPayment payment={item} />
-                )}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                className='mt-2'
-                contentContainerStyle={{
-                    paddingBottom: 20,
-                }}
-                ListEmptyComponent={
-                    <View className='flex-1 justify-center items-center'>
-                        <Text className='text-gray-500'>No recent payments</Text>
-                    </View>
-                }
-            /> */}
-
             {payments.map((payment) => (
                 <RenderPayment key={payment.id} payment={payment} />
             ))}

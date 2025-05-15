@@ -36,6 +36,33 @@ const MOCK_PAYMENTS = [
   { id: '10', vendorName: 'Hardware Haven', amount: 1100, date: '2025-03-18', status: 'Completed', method: 'Credit Card', reference: 'PMT-2025-010' },
 ];
 
+const FilterModal = ({ visible, onClose, onApply }) => {
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View className="flex-1 justify-end bg-black/50">
+        <View className="bg-white rounded-t-xl p-5 h-1/2">
+          <Text className="text-text text-lg font-bold mb-4">Filter Payments</Text>
+          {/* Add filter options here */}
+          <TouchableOpacity
+            className="bg-primary py-3 px-6 rounded-lg"
+            onPress={() => {
+              onApply();
+              onClose();
+            }}
+          >
+            <Text className="text-white font-bold">Apply Filters</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {
@@ -81,7 +108,7 @@ const renderPaymentItem = ({ item }) => {
           </View>
         </View>
         <View className="items-end">
-          <Text className="text-primary-dark font-bold">${item.amount.toLocaleString()}</Text>
+          <Text className="text-primary-dark font-bold">{item.amount.toLocaleString()} GMD</Text>
           <TouchableOpacity className="mt-2">
             <Feather name="chevron-right" size={20} color="#2C3E50" />
           </TouchableOpacity>
@@ -94,6 +121,7 @@ const renderPaymentItem = ({ item }) => {
 const PaymentRecordScreen = () => {
   const [payments, setPayments] = useState([]);
   const [filteredPayments, setFilteredPayments] = useState([]);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterActive, setFilterActive] = useState(false);
@@ -389,36 +417,9 @@ const PaymentRecordScreen = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filterActive={filterActive}
-        setFilterActive={setFilterActive}
+        setFilterActive={() => setFilterModalVisible(true)}
       />
-
-      {/* Filter Pills */}
-      {/* <View className="px-4 py-3">
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={filterOptions}
-          keyExtractor={(item) => item}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => setActiveFilter(item)}
-              className={`px-4 py-2 mr-2 rounded-full border ${activeFilter === item
-                  ? 'bg-primary'
-                  : 'bg-gray-100'
-                }`}
-            >
-              <Text
-                className={`${activeFilter === item
-                    ? 'text-white'
-                    : 'text-text'
-                  }`}
-              >
-                {item}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View> */}
+      
       <View>
 
       </View>
@@ -443,6 +444,11 @@ const PaymentRecordScreen = () => {
 
       {/* Payment Details Modal */}
       {renderPaymentModal()}
+
+      <FilterModal 
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        onApply={() => setFilterModalVisible(false)} />
     </SafeAreaView>
   );
 };
@@ -513,7 +519,7 @@ const PaymentsList = ({
               {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'} found
             </Text>
             <Text className="text-primary-dark font-bold">
-              Total: ${filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}
+              Total: {filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()} GMD
             </Text>
           </View>
           <FlatList

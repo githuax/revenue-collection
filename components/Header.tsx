@@ -18,7 +18,7 @@ export default function Header({ text, showBackButton = true }: HeaderProps) {
       const status = await Network.getNetworkStateAsync();
       setConnectionType(status.type);
       if(status.isConnected) {
-        // syncDb();
+        syncDb();
       }
     };
 

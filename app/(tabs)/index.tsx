@@ -19,38 +19,64 @@ import useAuthStore from '~/store/authStore';
 
 const Home = () => {
   const { userData } = useAuthStore();
+  console.log('userData', userData);
+
+  if (!userData) {
+    return (
+      <SafeAreaView className='flex-1 bg-background'>
+        <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
+        <View className='flex-1 justify-center items-center'>
+          <Text className='text-lg font-semibold'>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView className='flex-1 bg-background'>
       <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
       <ScrollView>
-      {/* Header */}
-      <Header 
-        text={`Hello ${userData?.first_name}`}
-        showBackButton={false}
-      />
+        {/* Header */}
+        <Header
+          text={`Hello ${userData?.first_name}`}
+          showBackButton={false}
+        />
 
-      <TouchableOpacity className='bg-primary/10 rounded-full px-4 py-2 flex-row items-center mx-4 my-2' onPress={() => {
-        syncDb();
-      }}>
-        <Text className='text-primary font-semibold'>Sync</Text>
-      </TouchableOpacity>
+        {/* Sync Database */}
+        <TouchableOpacity
+          className='absolute top-0 right-0 p-4'
+          onPress={async () => {
+            try {
+              await syncDb();
+            } catch (error) {
+              console.error('Error syncing database:', error);
+            }
+          }}
+        >
+          <Text className='text-sm text-gray-500'>Sync DB</Text>
+        </TouchableOpacity>
 
-      {/* Task Statistics */}
-      {/* <DashboardStats /> */}
-      
-      {/* Quick Actions */}
-      <DashboardActionTiles />
+        {/* Task Statistics */}
+        {/* <DashboardStats /> */}
 
-      {/* Recent Payments */}
-      <RecentPayments />
+        {/* Quick Actions */}
+        <DashboardActionTiles />
 
-      <PaymentsToday />
+        {/* Recent Payments */}
+        <RecentPayments />
 
-      <View className='flex-row justify-between items-center px-4 py-2'>
-        <PaymentsWeek />
-        <PaymentsMonth />
-      </View>
+        <PaymentsToday
+          userID={userData?.id}
+        />
+
+        <View className='flex-row justify-between items-center px-4 py-2'>
+          <PaymentsWeek
+            userID={userData?.id || ''}
+          />
+          <PaymentsMonth
+            userID={userData?.id || ''}
+          />
+        </View>
 
       </ScrollView>
 
@@ -65,15 +91,15 @@ const Home = () => {
         <View className='px-4'>
         </View>
       </View> */}
-     {false && ( <>{/* Quick Actions */}
-      <View className="mb-6">
+      {false && (<>{/* Quick Actions */}
+        <View className="mb-6">
           <Text className="text-sm uppercase font-medium text-gray-500 mb-2">Quick Actions</Text>
-          
+
           {/* Create Payment Button */}
           <TouchableOpacity className="bg-gray-200 rounded-lg p-3 mb-3">
             <Text className="text-lg font-medium text-gray-800">CREATE PAYMENT</Text>
           </TouchableOpacity>
-          
+
           {/* Add Payer and Add Property */}
           <View className="flex-row justify-between mb-4">
             <TouchableOpacity className="bg-gray-200 rounded-lg p-3 w-[48%]">
