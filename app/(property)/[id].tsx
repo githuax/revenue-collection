@@ -1,7 +1,7 @@
 import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Share } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
-import database, { propertiesCollection } from '../../db'
+import database, { payersCollection, propertiesCollection } from '../../db'
 import Property from '../../db/model/Property'
 import Payer from '../../db/model/Payer'
 import { Ionicons, Feather } from '@expo/vector-icons'
@@ -53,7 +53,9 @@ export default function PropertyDisplayScreen() {
         setProperty(propertyRecord);
         
         // Get owner info
-        const ownerRecord = await database.get('payers').find(propertyRecord.ownerId);
+        const ownerRecord = await payersCollection.query(
+          Q.where('id', propertyRecord.ownerId)
+        ).fetch().then(records => records[0]);
         setOwner(ownerRecord);
         
         // Format date from timestamp to YYYY-MM-DD
@@ -108,7 +110,9 @@ export default function PropertyDisplayScreen() {
 
     try {
       await database.write(async () => {
-        const propertyToUpdate = await database.get<Property>('properties').find(id);
+        const propertyToUpdate = await propertiesCollection.query(
+          Q.where('property_ref_no', propertyData.property_ref_no)
+        ).fetch().then(records => records[0]);
         
         await propertyToUpdate.update(property => {
           property.propertyRefNo = propertyData.property_ref_no;
@@ -282,11 +286,11 @@ export default function PropertyDisplayScreen() {
                 />
               ) : (
                 <View className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                  <Text className="text-blue-700 font-bold text-base">{owner?.name}</Text>
-                  {owner?.tpin && (
+                  <Text className="text-blue-700 font-bold text-base">{owner?.firstName} {owner?.lastName}</Text>
+                  {owner?.tin && (
                     <View className="flex-row items-center mt-2">
                       <Feather name="credit-card" size={14} color="#4B5563" />
-                      <Text className="text-gray-600 ml-2">TPIN: {owner.tpin}</Text>
+                      <Text className="text-gray-600 ml-2">TPIN: {owner.tin}</Text>
                     </View>
                   )}
                   {owner?.address && (
@@ -410,7 +414,7 @@ export default function PropertyDisplayScreen() {
                   <View className="flex-row">
                     <Ionicons name="cash-outline" size={20} color="#4B5563" />
                     <Text className="text-gray-700 ml-2">
-                      ${property?.assessPayment ? property.assessPayment.toFixed(2) : '0.00'}
+                      ${property?.assessPayment ? property.assessPayment : '0.00'}
                     </Text>
                   </View>
                 </View>

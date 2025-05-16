@@ -44,7 +44,9 @@ const enhance = withObservables([], () => ({
         Q.where('created_by', useAuthStore.getState().userData?.id || ''),
         Q.sortBy('created_date', 'desc'),
         Q.take(3)
-    ).observe(),
+    ).observeWithColumns(
+        paymentsCollection.schema.columnArray.map((column) => column.name)
+    ),
 }))
 
 const RecentPayments = enhance(RecentPaymentsComponent)

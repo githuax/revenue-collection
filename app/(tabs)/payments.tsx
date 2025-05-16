@@ -74,9 +74,9 @@ const formatDate = (dateString) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'Completed':
+    case 'synced':
       return { bg: 'bg-success/20', text: 'text-success' };
-    case 'Pending':
+    case 'pending':
       return { bg: 'bg-warning/20', text: 'text-warning' };
     case 'Failed':
       return { bg: 'bg-error/20', text: 'text-error' };

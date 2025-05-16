@@ -66,7 +66,7 @@ function Properties({ payerDetails, properties }) {
                             amount: property.amount
                         }}
                         onPress={() => { 
-                            router.push(`/(property)/${property.id}`);
+                            router.push(`/(property)/${property.propertyRefNo}`);
                         }}
                     />
                 </>
