@@ -14,7 +14,7 @@ const statusColors: Record<string,string> = {
 const RenderPayment = ({ payment }) => {
     return (
         <View className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100 '>
-            <View className={`mb-2 px-3 py-1 rounded-full bg-primary/10 self-start ${statusColors[payment.status]}`}>
+            <View className={`mb-2 px-3 py-1 rounded-full self-start ${statusColors[payment.status]}`}>
                 <Text className='capitalize text-white tracking-wider'>{payment.status}</Text>
             </View>
             <View className='flex-row justify-between items-center mb-3'>
