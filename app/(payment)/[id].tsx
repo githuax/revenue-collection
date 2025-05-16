@@ -83,7 +83,7 @@ const PaymentDisplayScreen = () => {
           value: payerRecord.id,
           id: payerRecord.id,
           name: payerRecord.name,
-          address: payerRecord.address,
+          location: payerRecord.location,
           phoneNumber: payerRecord.phoneNumber,
           tpin: payerRecord.tpin,
         });
@@ -96,7 +96,7 @@ const PaymentDisplayScreen = () => {
 
         if (paymentRecord.location) {
           setLocation(paymentRecord.location);
-          getAddressFromCoordinates(paymentRecord.location);
+          getlocationFromCoordinates(paymentRecord.location);
         }
       } else {
         Alert.alert('Error', 'Payment not found');
@@ -110,7 +110,7 @@ const PaymentDisplayScreen = () => {
     }
   };
 
-  const getAddressFromCoordinates = async (coords) => {
+  const getlocationFromCoordinates = async (coords) => {
     try {
       const geocode = await Location.reverseGeocodeAsync({
         latitude: coords.latitude,
@@ -118,11 +118,11 @@ const PaymentDisplayScreen = () => {
       });
 
       if (geocode && geocode.length > 0) {
-        const address = geocode[0];
-        setLocationText(`${address.street || ''} ${address.city || ''}, ${address.region || ''}`);
+        const location = geocode[0];
+        setLocationText(`${location.street || ''} ${location.city || ''}, ${location.region || ''}`);
       }
     } catch (error) {
-      console.error('Error getting address:', error);
+      console.error('Error getting location:', error);
       setLocationText('Location available');
     }
   };
@@ -142,8 +142,8 @@ const PaymentDisplayScreen = () => {
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation.coords);
 
-      // Get address from coordinates (geocoding)
-      getAddressFromCoordinates(currentLocation.coords);
+      // Get location from coordinates (geocoding)
+      getlocationFromCoordinates(currentLocation.coords);
     } catch (error) {
       console.error('Error getting location:', error);
       Alert.alert('Error', 'Failed to get current location');
@@ -343,7 +343,7 @@ const PaymentDisplayScreen = () => {
                   <View className="flex-row items-center mt-1">
                     <Feather name="map-pin" size={14} color="#4B5563" />
                     <Text className="text-gray-600 ml-2">
-                      {isEditing ? selectedVendor?.address : payer?.address}
+                      {isEditing ? selectedVendor?.location : payer?.location}
                     </Text>
                   </View>
                   <View className="flex-row items-center mt-1">
@@ -478,7 +478,7 @@ const PaymentDisplayScreen = () => {
                   <View className="flex-row items-center mt-2">
                     <Feather name="info" size={14} color="#4B5563" />
                     <Text className="text-gray-500 text-sm ml-1">
-                      Lat: {location.latitude.toFixed(6)}, Long: {location.longitude.toFixed(6)}
+                      {location}
                     </Text>
                   </View>
                 )}

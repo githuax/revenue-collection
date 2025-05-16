@@ -11,7 +11,7 @@ export default function SearchBar({
 }) {
     return (
         <View className="px-4 pb-2 flex-row justify-between items-center">
-            <View className="flex-row items-center bg-white rounded-lg px-3 py-2 w-[88%] shadow-sm">
+            <View className="flex-row items-center bg-white rounded-lg px-3 py-2 w-full shadow-sm">
                 <Feather name="search" size={20} color="#8896A6" />
                 <TextInput
                     className="flex-1 ml-2 text-gray-800"
@@ -27,7 +27,7 @@ export default function SearchBar({
                 ) : null}
             </View>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 className={`rounded-lg p-2 flex-row items-center justify-center shadow-sm ${filterActive ? 'bg-blue-500' : 'bg-white'}`}
                 onPress={() => setFilterActive(!filterActive)}
             >
@@ -37,7 +37,7 @@ export default function SearchBar({
                     color={filterActive ? "#FFFFFF" : "#2C3E50"}
                 />
 
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     )
 }

@@ -18,16 +18,17 @@ import {
 import RegisterNewPropertyModal from '~/components/modals/RegisterNewPropertyModal';
 import RegistrationSection from '~/components/settings/RegistrationSection';
 import useAuthStore from '~/store/authStore';
+import { supabase } from '~/utils/supabase';
+import { UserData } from '~/types';
 
 // Mock user data
 const MOCK_USER = {
   id: 'TC-2458',
   name: 'James Wilson',
   email: 'jwilson@taxdept.gov',
-  phone: '(555) 123-4567',
+  phone: '',
   department: 'Commercial Tax Collection',
-  position: 'Senior Tax Collector',
-  jurisdiction: 'Metro County',
+  position: '',
   notificationPreferences: {
     email: true,
     push: true,
@@ -38,43 +39,36 @@ const MOCK_USER = {
 const Profile = () => {
   const [user, setUser] = useState(MOCK_USER);
   const [editingUser, setEditingUser] = useState(false);
-  const [tempUser, setTempUser] = useState(MOCK_USER);
+  const [tempUser, setTempUser] = useState<Partial<UserData>>({});
 
   const { user: storeUser, userData, logout } = useAuthStore();
-  
-  // For demonstration purposes - in a real app this would come from an API
-  const [recentPayers, setRecentPayers] = useState([
-    {
-      id: 'P-1001',
-      name: 'City Supermarket Chain',
-      type: 'Business',
-      identifier: 'BUS-78954',
-      registeredDate: '2025-03-15',
-    },
-    {
-      id: 'P-1002',
-      name: 'Downtown Office Complex',
-      type: 'Business',
-      identifier: 'BUS-32156',
-      registeredDate: '2025-04-02',
-    },
-    {
-      id: 'P-1003',
-      name: 'Sarah Johnson',
-      type: 'Individual',
-      identifier: 'IND-65432',
-      registeredDate: '2025-04-10',
-    },
-  ]);
 
-  const handleSaveUserChanges = () => {
-    // In a real app, this would call an API to update the user profile
-    setUser(tempUser);
-    setEditingUser(false);
-    Alert.alert('Success', 'Your profile has been updated successfully.');
+  const handleSaveUserChanges = async () => {
+    const updatedUser = {
+      firstName: tempUser.first_name,
+      lastName: tempUser.last_name,
+      phone: tempUser.phone,
+    }
+
+    try {
+      // Update user data in Supabase
+      const { error } = await supabase
+        .from('user')
+        .update(updatedUser)
+        .eq('id', storeUser?.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setEditingUser(false);
+      Alert.alert('Success', 'Your profile has been updated successfully.');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to update profile. Please try again.');
+    }
   };
 
-  const renderSectionHeader = (title) => (
+  const renderSectionHeader = (title: string) => (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
     </View>
@@ -118,10 +112,6 @@ const Profile = () => {
               <Text style={styles.detailLabel}>Phone</Text>
               <Text style={styles.detailValue}>{storeUser?.phone}</Text>
             </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Jurisdiction</Text>
-              <Text style={styles.detailValue}>{user.jurisdiction}</Text>
-            </View>
           </View>
         </View>
         
@@ -143,7 +133,9 @@ const Profile = () => {
         </View>
         
         <TouchableOpacity style={styles.logoutButton} onPress={() => {
-          logout();
+          logout().then(() => {
+            
+          });
         }}>
           <Text style={styles.logoutButtonText}>Log Out</Text>
         </TouchableOpacity>
@@ -174,12 +166,22 @@ const Profile = () => {
             
             <ScrollView style={styles.modalScrollView}>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Full Name</Text>
+                <Text style={styles.inputLabel}>First Name</Text>
                 <TextInput
                   style={styles.input}
-                  value={userData?.first_name + ' ' + userData?.last_name}
-                  onChangeText={(text) => setTempUser({...tempUser, name: text})}
-                  placeholder="Enter your full name"
+                  value={tempUser.first_name || userData?.first_name}
+                  onChangeText={(text) => setTempUser({...tempUser, first_name: text})}
+                  placeholder="Enter your first name"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Last Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={tempUser.last_name || userData?.last_name}
+                  onChangeText={(text) => setTempUser({...tempUser, last_name: text})}
+                  placeholder="Enter your last name"
                 />
               </View>
               
@@ -187,11 +189,11 @@ const Profile = () => {
                 <Text style={styles.inputLabel}>Email</Text>
                 <TextInput
                   style={styles.input}
-                  value={user.email}
-                  onChangeText={(text) => setTempUser({...tempUser, email: text})}
+                  value={storeUser?.email}
                   placeholder="Enter your email address"
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  editable={false}
                 />
               </View>
               
@@ -199,40 +201,10 @@ const Profile = () => {
                 <Text style={styles.inputLabel}>Phone Number</Text>
                 <TextInput
                   style={styles.input}
-                  value={tempUser.phone}
+                  value={tempUser.phone || userData?.phone}
                   onChangeText={(text) => setTempUser({...tempUser, phone: text})}
                   placeholder="Enter your phone number"
                   keyboardType="phone-pad"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Department</Text>
-                <TextInput
-                  style={styles.input}
-                  value={tempUser.department}
-                  onChangeText={(text) => setTempUser({...tempUser, department: text})}
-                  placeholder="Enter your department"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Position</Text>
-                <TextInput
-                  style={styles.input}
-                  value={tempUser.position}
-                  onChangeText={(text) => setTempUser({...tempUser, position: text})}
-                  placeholder="Enter your position"
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Jurisdiction</Text>
-                <TextInput
-                  style={styles.input}
-                  value={tempUser.jurisdiction}
-                  onChangeText={(text) => setTempUser({...tempUser, jurisdiction: text})}
-                  placeholder="Enter your jurisdiction"
                 />
               </View>
               

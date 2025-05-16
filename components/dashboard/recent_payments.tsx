@@ -5,11 +5,17 @@ import { paymentsCollection } from '~/db'
 import { Q } from '@nozbe/watermelondb'
 import useAuthStore from '~/store/authStore'
 
+const statusColors: Record<string,string> = {
+    synced: 'bg-[#22c55e]',
+    pending: 'bg-amber-300'
+}
+
+
 const RenderPayment = ({ payment }) => {
     return (
-        <View className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
-            <View className='mb-2 px-3 py-1 rounded-full bg-primary/10 w-fit'>
-                <Text className='capitalize w-fit'>{payment.status}</Text>
+        <View className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100 '>
+            <View className={`mb-2 px-3 py-1 rounded-full bg-primary/10 self-start ${statusColors[payment.status]}`}>
+                <Text className='capitalize text-white tracking-wider'>{payment.status}</Text>
             </View>
             <View className='flex-row justify-between items-center mb-3'>
                 <Text className='text-lg font-semibold'>{payment.ref_no}</Text>

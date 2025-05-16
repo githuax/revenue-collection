@@ -99,7 +99,7 @@ const renderPaymentItem = ({ item }) => {
         <View className="flex-1">
           <Text className="text-text text-lg font-semibold">{item.vendorName}</Text>
           <Text className="text-text/70 mt-1">Ref: {item.reference}</Text>
-          <Text className="text-text/70 mt-1">{formatDate(item.date)}</Text>
+          <Text className="text-text/70 mt-1">{`${item.date}`}</Text>
           <View className="flex-row items-center mt-2">
             <Text className="text-text/70 mr-2">{item.method}</Text>
             <View className={`px-2 py-1 rounded-full ${statusStyle.bg}`}>
@@ -136,30 +136,9 @@ const PaymentRecordScreen = () => {
     status: ''
   });
 
-  useEffect(() => {
-    getMyPayments().then(data => {
-      console.log('Fetched User payments:', data.length);
-    })
-  }, []);
+  
 
-  useEffect(() => {
-    getPaymentInfoWithPayerName().then(data => {
-      const transformedData = data.map((payment) => ({
-        ...payment,
-        vendorName: payment.payerName,
-        amount: payment._raw.amount || 0,
-        date: Date(payment._raw.createdDate).toString(),
-        status: payment._raw.status,
-        method: payment._raw.payment_method,
-        reference: payment._raw.ref_no,
-      }));
-
-      setPayments(transformedData);
-      setFilteredPayments(transformedData);
-      setLoading(false);
-    })
-  }, []);
-
+  
   // Filter payments based on search query and active filter
   useEffect(() => {
     let result = payments;
@@ -471,7 +450,7 @@ const PaymentsList = ({
         ...payment,
         vendorName: payerName,
         amount: payment._raw.amount || 0,
-        date: Date(payment._raw.createdDate).toString(),
+        date: new Date(payment._raw.created_date),
         status: payment._raw.status,
         method: payment._raw.payment_method,
         reference: payment._raw.ref_no,
@@ -525,6 +504,7 @@ const PaymentsList = ({
           <FlatList
             data={filteredPayments}
             keyExtractor={(item) => item.id}
+            key={item => item.id}
             renderItem={renderPaymentItem}
             showsVerticalScrollIndicator={false}
           />
@@ -537,11 +517,13 @@ const enhance = withObservables([], () => ({
   payments: paymentsCollection.query().observeWithColumns(
     paymentsCollection.schema.columnArray.map(c => c.name),
   ),
-  payers: paymentsCollection.query().observe().pipe(
+  payers: paymentsCollection.query(
+    Q.sortBy('created_date', 'desc'),
+  ).observe().pipe(
     map(payments => {
       const payerIds = payments.map(payment => payment.payer_id);
       return payersCollection.query(
-        Q.where('id', Q.oneOf(payerIds)),
+        Q.where('id', Q.oneOf(payerIds))
       ).observe();
     }),
     switchAll()

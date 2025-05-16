@@ -5,7 +5,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 import PaymentsMonth from '~/components/dashboard/payments_month';
 import PaymentsToday from '~/components/dashboard/payments_today';
@@ -19,14 +20,13 @@ import useAuthStore from '~/store/authStore';
 
 const Home = () => {
   const { userData } = useAuthStore();
-  console.log('userData', userData);
 
   if (!userData) {
     return (
       <SafeAreaView className='flex-1 bg-background'>
         <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
         <View className='flex-1 justify-center items-center'>
-          <Text className='text-lg font-semibold'>Loading...</Text>
+          <ActivityIndicator size="large" color="#0000ff" />
         </View>
       </SafeAreaView>
     )
@@ -43,7 +43,7 @@ const Home = () => {
         />
 
         {/* Sync Database */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className='absolute top-0 right-0 p-4'
           onPress={async () => {
             try {
@@ -54,7 +54,7 @@ const Home = () => {
           }}
         >
           <Text className='text-sm text-gray-500'>Sync DB</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Task Statistics */}
         {/* <DashboardStats /> */}

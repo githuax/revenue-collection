@@ -3,7 +3,9 @@ import "react-native-reanimated"
 
 import { SafeAreaView, StatusBar } from 'react-native';
 import '../global.css';
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
+import useAuthStore from "~/store/authStore";
+import { useEffect } from "react";
 
 export default function Layout() {
 	return (

@@ -39,7 +39,7 @@ const NewPaymentScreen = () => {
                     value: payerId,
                     id: payerId,
                     name: payerName,
-                    address: payerAddress,
+                    location: payerAddress,
                     phoneNumber: payerPhone,
                     tpin: payerTIN,
                 }
@@ -203,7 +203,7 @@ const NewPaymentScreen = () => {
                   </View>
                   <View className="flex-row items-center mt-1">
                     <Feather name="map-pin" size={14} color="#4B5563" />
-                    <Text className="text-gray-600 ml-2">{selectedVendor.address}</Text>
+                    <Text className="text-gray-600 ml-2">{selectedVendor.location}</Text>
                   </View>
                   <View className="flex-row items-center mt-1">
                     <Feather name="phone" size={14} color="#4B5563" />

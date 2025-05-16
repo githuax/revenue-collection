@@ -12,7 +12,7 @@ type AuthStore = {
     userData: UserData | null;
     session: Session | null;
     login: (email: string, password: string) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -61,6 +61,7 @@ supabase.auth.onAuthStateChange((event, session) => {
     } else if (event === "SIGNED_OUT") {
         useAuthStore.setState({ user: null });
         useAuthStore.setState({ session: null });
+        useAuthStore.setState({ userData: null });
     }
     else if (event === "TOKEN_REFRESHED") {
         useAuthStore.setState({ session });
