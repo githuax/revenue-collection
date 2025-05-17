@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useCameraPermissions } from 'expo-camera';
 import { getAllPayers } from '~/services/dbService';
+import { useTempStore } from '~/store/tempStore';
 
 export default function SelectPayer({
     value,
@@ -15,12 +16,28 @@ export default function SelectPayer({
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
 
-    const [scanned, setScanned] = useState(false);
+    const { data, removeData } = useTempStore();
 
     const [permission, requestPermission] = useCameraPermissions();
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
 
     const [payers, setPayers] = useState([]);
+
+    useEffect(() => {
+        if (data) {
+            console.log('Scanned data:', data);
+            console.log('Payers:', payers);
+            const selectedPayer = payers.find(payer => payer.tpin === data);
+            if (selectedPayer) {
+                setSelectedVendor(selectedPayer);
+                setSearchQuery(selectedPayer.name);
+                onVendorSelect(selectedPayer);
+                removeData();
+            } else {
+                Alert.alert('Invalid QR Code', 'The scanned QR code does not match any payer.');
+            }
+        }
+    }, [data])
 
     // Request camera permissions
     useEffect(() => {
@@ -55,11 +72,6 @@ export default function SelectPayer({
         }
     };
 
-    const handleBarCodeScanned = ({ type, data }) => {
-        setScanned(true);
-        alert(`QR Code scanned! Type: ${type}\nData: ${data}`);
-    };
-
     return (
         <View className="flex-row items-center justify-between">
             <View className='w-[85%]'>
@@ -77,7 +89,6 @@ export default function SelectPayer({
                 onPress={() => {
                     if (hasCameraPermission) {
                         router.push('/(new_payments)/camera')
-                        setScanned(false);
                     } else {
                         Alert.alert('Permission Required', 'Camera permission is required to scan QR codes');
                     }

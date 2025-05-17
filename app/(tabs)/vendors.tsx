@@ -96,7 +96,7 @@ const VendorScreen = () => {
 
       {/* Filter Pills */}
       <View className="px-4 py-3">
-        <FlatList
+        {/* <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={filterOptions}
@@ -119,7 +119,7 @@ const VendorScreen = () => {
               </Text>
             </TouchableOpacity>
           )}
-        />
+        /> */}
       </View>
 
       {/* Vendor List */}

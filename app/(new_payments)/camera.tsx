@@ -3,11 +3,14 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTempStore } from '~/store/tempStore';
 
 export default function Camera() {
     const [facing, setFacing] = useState<CameraType>('back');
      const [scanned, setScanned] = useState(false);
     const [permission, requestPermission] = useCameraPermissions();
+
+    const { setData } = useTempStore();
 
     if (!permission) {
         // Camera permissions are still loading.
@@ -30,7 +33,8 @@ export default function Camera() {
 
     function handleBarCodeScanned({ type, data }) {
         setScanned(true);
-        alert(`QR Code scanned! Type: ${type}\nData: ${data}`);
+        // alert(`QR Code scanned! Type: ${type}\nData: ${data}`);
+        setData(data);
         router.back();
     }
 

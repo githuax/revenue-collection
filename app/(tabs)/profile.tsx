@@ -92,7 +92,7 @@ const Profile = () => {
               <Text style={styles.profileDepartment}>{user.department}</Text>
               <Text style={styles.profilePosition}>{user.position}</Text>
             </View>
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
               style={styles.editButton}
               onPress={() => {
                 setTempUser({...user});
@@ -100,7 +100,7 @@ const Profile = () => {
               }}
             >
               <Text style={styles.editButtonText}>Edit</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           
           <View style={styles.profileDetails}>
