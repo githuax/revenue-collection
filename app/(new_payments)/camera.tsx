@@ -6,6 +6,7 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Camera() {
     const [facing, setFacing] = useState<CameraType>('back');
+     const [scanned, setScanned] = useState(false);
     const [permission, requestPermission] = useCameraPermissions();
 
     if (!permission) {
@@ -27,11 +28,22 @@ export default function Camera() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
     }
 
+    function handleBarCodeScanned({ type, data }) {
+        setScanned(true);
+        alert(`QR Code scanned! Type: ${type}\nData: ${data}`);
+        router.back();
+    }
+
     return (
         <View style={styles.container}>
-            <CameraView style={styles.camera} facing={facing} barcodeScannerSettings={{
-                barcodeTypes: ["qr"],
-            }}>
+            <CameraView 
+                style={styles.camera} 
+                facing={facing} 
+                barcodeScannerSettings={{
+                    barcodeTypes: ["qr"],
+                }}
+                onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+            >
                 <View className="flex-1 bg-transparent justify-between">
                     <View className="bg-black/50 p-4">
                         <TouchableOpacity
@@ -51,12 +63,12 @@ export default function Camera() {
 
                     <View className="bg-black/50 p-4">
                         {/* {scanned && ( */}
-                            <TouchableOpacity
-                                onPress={() => {}}
-                                className="bg-white py-3 rounded-lg items-center"
-                            >
-                                <Text className="text-primary font-bold">Scan Again</Text>
-                            </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setScanned(false)}
+                            className="bg-white py-3 rounded-lg items-center"
+                        >
+                            <Text className="text-primary font-bold">Scan Again</Text>
+                        </TouchableOpacity>
                         {/* )} */}
                     </View>
                 </View>

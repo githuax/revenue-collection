@@ -22,11 +22,11 @@ export default function SelectPayer({
 
     const [payers, setPayers] = useState([]);
 
-     // Request camera permissions
-      useEffect(() => {
+    // Request camera permissions
+    useEffect(() => {
         (async () => {
-          const { status } = await requestPermission();
-          setHasCameraPermission(status === 'granted');
+            const { status } = await requestPermission();
+            setHasCameraPermission(status === 'granted');
         })();
 
         getAllPayers().then((payers) => {
@@ -43,23 +43,7 @@ export default function SelectPayer({
             setPayers(transformedPayers);
             setSearchResults(transformedPayers);
         })
-      }, []);
-
-
-    // Handle search input change
-    const handleSearch = (query) => {
-        setSearchQuery(query);
-        if (query) {
-            const filteredResults = TRANSFORMED_MOCK_VENDORS.filter(vendor =>
-                vendor.name.toLowerCase().includes(query.toLowerCase()) ||
-                vendor.tpin.toLowerCase().includes(query.toLowerCase()) ||
-                vendor.phoneNumber.includes(query)
-            );
-            setSearchResults(filteredResults);
-        } else {
-            setSearchResults(TRANSFORMED_MOCK_VENDORS);
-        }
-    };
+    }, []);
 
     // Handle vendor selection
     const selectVendor = (vendor) => {
@@ -71,17 +55,22 @@ export default function SelectPayer({
         }
     };
 
+    const handleBarCodeScanned = ({ type, data }) => {
+        setScanned(true);
+        alert(`QR Code scanned! Type: ${type}\nData: ${data}`);
+    };
+
     return (
         <View className="flex-row items-center justify-between">
             <View className='w-[85%]'>
-            <DropdownComponent
-                data={payers}
-                valueField='id'
-                initialValue={selectedVendor}
-                placeholder="Select Payer"
-                searchPlaceholder="Search by name, TPIN or phone number"
-                onChange={selectVendor}
-            />
+                <DropdownComponent
+                    data={payers}
+                    valueField='id'
+                    initialValue={selectedVendor}
+                    placeholder="Select Payer"
+                    searchPlaceholder="Search by name, TPIN or phone number"
+                    onChange={selectVendor}
+                />
             </View>
             <TouchableOpacity
                 className="flex-row items-center justify-center bg-primary/10 w-[12%] py-3 rounded-lg"

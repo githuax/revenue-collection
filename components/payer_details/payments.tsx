@@ -33,7 +33,7 @@ function Payments({ payerDetails, payments }) {
                 >
                     <Text className='text-text font-semibold'>Payment ID: {payment.ref_no}</Text>
                     <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
-                    <Text className='text-text/70 mt-1'>Date: {payment.created_date}</Text>
+                    <Text className='text-text/70 mt-1'>Date: {payment.createdDate}</Text>
                     <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
                 </TouchableOpacity>
             ))}
