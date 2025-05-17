@@ -21,7 +21,7 @@ const RenderPayment = ({ payment }) => {
                 <Text className='text-lg font-semibold'>{payment.ref_no}</Text>
                 <Text>{payment.amount} GMD</Text>
             </View>
-            <Text>{`${Date(payment.createdDate)}`}</Text>
+            <Text>{`${new Date(payment.createdDate)}`}</Text>
         </View>
     )
 }

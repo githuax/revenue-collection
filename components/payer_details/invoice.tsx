@@ -33,7 +33,7 @@ function Invoices({ payerDetails, invoices }) {
                 >
                     <Text className='text-text font-semibold'>Invoice ID: {invoice.ref_no}</Text>
                     <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
-                    <Text className='text-text/70 mt-1'>Date: {invoice.due_date}</Text>
+                    <Text className='text-text/70 mt-1'>Date: {`${new Date(invoice.dueDate)}`}</Text>
                     <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
                 </TouchableOpacity>
             ))}
