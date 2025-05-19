@@ -71,6 +71,13 @@ function Properties({ payerDetails, properties }) {
                     />
                 </>
             ))}
+            <TouchableOpacity className='p-4 mb-3 flex-row justify-center items-center'
+                onPress={() => {
+                    router.push(`/(vendor)/property/${payerDetails?.id}`);
+                }}
+            >
+                <Text className='text-text font-semibold'>View All Properties</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -78,6 +85,8 @@ function Properties({ payerDetails, properties }) {
 const enhance = withObservables(['payerDetails'], ({ payerDetails }) => ({
     properties: propertiesCollection.query(
         Q.where('owner_id', payerDetails.id),
+        Q.sortBy('last_modified_date', 'desc'),
+        Q.take(5),
     ).observeWithColumns(
         propertiesCollection.schema.columnArray.map((column) => column.name)
     )

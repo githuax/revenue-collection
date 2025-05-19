@@ -359,7 +359,8 @@ const PaymentDisplayScreen = () => {
             {/* Payment Details Card */}
             <View className="bg-white rounded-2xl shadow-md p-6 mb-6">
               <View className="flex-row items-center mb-4">
-                <Feather name="dollar-sign" size={22} color="#2C3E50" />
+                {/* <Feather name="dollar-sign" size={22} color="#2C3E50" /> */}
+                <Text className='text-[#4B5563]'>GMD</Text>
                 <Text className="text-gray-800 font-bold ml-2 text-lg">Payment Details</Text>
               </View>
 
@@ -380,7 +381,8 @@ const PaymentDisplayScreen = () => {
                 <Text className="text-gray-700 font-semibold mb-2">Amount</Text>
                 {isEditing ? (
                   <View className="flex-row items-center border border-gray-200 rounded-xl bg-white px-4">
-                    <Feather name="dollar-sign" size={20} color="#4B5563" />
+                    {/* <Feather name="dollar-sign" size={20} color="#4B5563" /> */}
+                    <Text className='text-[#4B5563]'>GMD</Text>
                     <TextInput
                       className="flex-1 py-3 px-3 text-gray-700"
                       placeholder="0.00"
@@ -392,7 +394,8 @@ const PaymentDisplayScreen = () => {
                   </View>
                 ) : (
                   <View className="flex-row items-center border border-gray-200 rounded-xl bg-gray-50 px-4 py-3">
-                    <Feather name="dollar-sign" size={20} color="#4B5563" />
+                    {/* <Feather name="dollar-sign" size={20} color="#4B5563" /> */}
+                    <Text className='text-[#4B5563]'>GMD</Text>
                     <Text className="text-gray-700 ml-3 font-medium">${payment?.amount.toFixed(2)}</Text>
                   </View>
                 )}

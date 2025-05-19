@@ -32,11 +32,18 @@ function Invoices({ payerDetails, invoices }) {
                     }}
                 >
                     <Text className='text-text font-semibold'>Invoice ID: {invoice.ref_no}</Text>
-                    <Text className='text-text/70 mt-1'>Amount: ${invoice.amountDue}</Text>
+                    <Text className='text-text/70 mt-1'>Amount: {invoice.amountDue} GMD</Text>
                     <Text className='text-text/70 mt-1'>Date: {`${new Date(invoice.dueDate)}`}</Text>
                     <Text className='text-text/70 mt-1'>Status: {invoice.status}</Text>
                 </TouchableOpacity>
             ))}
+            <TouchableOpacity className='p-4 mb-3 flex-row justify-center items-center'
+                onPress={() => {
+                    router.push(`/(vendor)/invoice/${payerDetails?.id}`);
+                }}
+            >
+                <Text className='text-text font-semibold'>View All Invoices</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -44,6 +51,8 @@ function Invoices({ payerDetails, invoices }) {
 const enhance = withObservables(['payerDetails'], ({ payerDetails }) => ({
     invoices: invoicesCollection.query(
         Q.where('payer_id', payerDetails.id),
+        Q.sortBy('date', 'desc'),
+        Q.take(5),
     ).observeWithColumns(
         invoicesCollection.schema.columnArray.map((column) => column.name),
     ),

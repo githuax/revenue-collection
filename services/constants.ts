@@ -36,8 +36,7 @@ const PAYMENT_TYPES = [
 ]
 
 const PAYMENT_METHODS = [
-    'Credit Card',
-    'Debit Card',
+    'Mobile Money',
     'Bank Transfer',
     'Cash',
     'Other'

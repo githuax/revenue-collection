@@ -32,11 +32,18 @@ function Payments({ payerDetails, payments }) {
                     }}
                 >
                     <Text className='text-text font-semibold'>Payment ID: {payment.ref_no}</Text>
-                    <Text className='text-text/70 mt-1'>Amount: ${payment.amount}</Text>
+                    <Text className='text-text/70 mt-1'>Amount: {payment.amount} GMD</Text>
                     <Text className='text-text/70 mt-1'>Date: {`${payment.createdDate}`}</Text>
                     <Text className='text-text/70 mt-1'>Status: {payment.status}</Text>
                 </TouchableOpacity>
             ))}
+            <TouchableOpacity className='p-4 mb-3 flex-row justify-center items-center'
+                onPress={() => {
+                    router.push(`/(vendor)/payments/${payerDetails?.id}`);
+                }}
+            >
+                <Text className='text-text font-semibold'>View All Payments</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -44,6 +51,8 @@ function Payments({ payerDetails, payments }) {
 const enhance = withObservables(['payerDetails'], ({ payerDetails }) => ({
     payments: paymentsCollection.query(
         Q.where('payer_id', payerDetails.id),
+        Q.sortBy('created_date', 'desc'),
+        Q.take(5),
     ).observeWithColumns(
         paymentsCollection.schema.columnArray.map((column) => column.name),
     ),
