@@ -14,10 +14,9 @@ import {
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-import database, { payersCollection, paymentsCollection } from '~/db';
+import { payersCollection, paymentsCollection } from '~/db';
 import Header from '~/components/Header';
 import SearchBar from '~/components/SearchBar';
-import { getAllPayments, getMyPayments, getPaymentInfoWithPayerName } from '~/services/dbService';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { Q } from '@nozbe/watermelondb';
 import { switchAll, map } from 'rxjs/operators';

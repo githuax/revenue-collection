@@ -1,9 +1,8 @@
 import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 import database from '../../db'
 import Property from '../../db/model/Property'
-import Payer from '../../db/model/Payer'
 import { Ionicons } from '@expo/vector-icons'
 import Header from '~/components/Header'
 import ReferenceNumber from '~/components/ReferenceNumber'
@@ -12,7 +11,6 @@ import DropdownComponent from '~/components/DropDown'
 import { PROPERTY_TYPES } from '~/services/constants'
 import StatusModal from '~/components/modals/Status'
 import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system';
 import { supabase } from '~/utils/supabase'
 
 export default function Add() {

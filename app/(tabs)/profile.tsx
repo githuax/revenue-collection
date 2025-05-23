@@ -5,18 +5,14 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  StatusBar,
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Switch,
   Alert,
   Modal,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import RegisterNewPropertyModal from '~/components/modals/RegisterNewPropertyModal';
-import RegistrationSection from '~/components/settings/RegistrationSection';
 import useAuthStore from '~/store/authStore';
 import { supabase } from '~/utils/supabase';
 import { UserData } from '~/types';

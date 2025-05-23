@@ -1,5 +1,5 @@
 import { Model } from '@nozbe/watermelondb'
-import { field, date, readonly, relation } from '@nozbe/watermelondb/decorators'
+import { field, relation } from '@nozbe/watermelondb/decorators'
 
 export default class LoginHistory extends Model {
   static table = 'login_histories'

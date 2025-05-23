@@ -1,4 +1,4 @@
-import { View, Text, KeyboardAvoidingView, Modal, ScrollView, TouchableOpacity, Platform, TextInput, FlatList } from 'react-native'
+import { View, Text, KeyboardAvoidingView, Modal, ScrollView, TouchableOpacity, Platform, TextInput } from 'react-native'
 import React, { useState } from 'react'
 
 const dummyOwners = [

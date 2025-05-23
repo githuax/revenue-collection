@@ -1,6 +1,5 @@
 import { Model } from '@nozbe/watermelondb'
-import { field, date, readonly, relation } from '@nozbe/watermelondb/decorators'
-import { Associations } from '@nozbe/watermelondb/Model'
+import { field } from '@nozbe/watermelondb/decorators'
 
 export default class Property extends Model {
   static table = 'properties'

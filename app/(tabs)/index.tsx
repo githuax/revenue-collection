@@ -15,7 +15,6 @@ import RecentPayments from '~/components/dashboard/recent_payments';
 import DashboardActionTiles from '~/components/DashboardActionTiles';
 import DashboardStats from '~/components/DashboardStats';
 import Header from '~/components/Header';
-import syncDb from '~/db/sync';
 import useAuthStore from '~/store/authStore';
 
 const Home = () => {
@@ -41,20 +40,6 @@ const Home = () => {
           text={`Hello ${userData?.first_name}`}
           showBackButton={false}
         />
-
-        {/* Sync Database */}
-        {/* <TouchableOpacity
-          className='absolute top-0 right-0 p-4'
-          onPress={async () => {
-            try {
-              await syncDb();
-            } catch (error) {
-              console.error('Error syncing database:', error);
-            }
-          }}
-        >
-          <Text className='text-sm text-gray-500'>Sync DB</Text>
-        </TouchableOpacity> */}
 
         {/* Task Statistics */}
         {/* <DashboardStats /> */}

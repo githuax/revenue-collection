@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
@@ -13,7 +12,6 @@ import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { payersCollection } from '~/db';
 import { withObservables } from '@nozbe/watermelondb/react';
-import Payer from '~/db/model/Payer';
 import Header from '~/components/Header';
 import SearchBar from '~/components/SearchBar';
 

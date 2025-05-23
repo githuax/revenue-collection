@@ -1,6 +1,5 @@
 import { Model } from '@nozbe/watermelondb'
-import { field, text, date, readonly, relation, children } from '@nozbe/watermelondb/decorators'
-import { Associations } from '@nozbe/watermelondb/Model'
+import { field, date } from '@nozbe/watermelondb/decorators'
 
 export default class Payment extends Model {
   static table = 'payments'
