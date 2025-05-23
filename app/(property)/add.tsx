@@ -1,4 +1,4 @@
-import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native'
+import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 import database from '../../db'
@@ -11,14 +11,32 @@ import SelectPayer from '~/components/SelectPayer'
 import DropdownComponent from '~/components/DropDown'
 import { PROPERTY_TYPES } from '~/services/constants'
 import StatusModal from '~/components/modals/Status'
+import * as ImagePicker from 'expo-image-picker'
+import * as FileSystem from 'expo-file-system';
+import { supabase } from '~/utils/supabase'
 
 export default function Add() {
   const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
+  const [image, setImage] = useState<string | null>(null);
 
   const transformedPropertyTypes = PROPERTY_TYPES.map((type) => ({
     label: type,
     value: type,
   }))
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
@@ -44,6 +62,25 @@ export default function Add() {
 
   const handleSubmit = async () => {
     try {
+      // get the image extension
+      const name = `public/${Date.now()}.${image.split('.').pop()}`
+
+      const formData = new FormData();
+        formData.append('file', {
+          uri: image,
+          name: name,
+          type: 'image/jpeg',
+        } as any);
+
+      // upload the image
+      const { data, error } = await supabase.storage.from('property-pics').upload(name, formData.get('file') as File, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: 'image/jpeg'
+      })
+
+      console.log(data, error)
+
       const propertiesCollection = database.collections.get<Property>('properties')
 
       await database.write(async () => {
@@ -55,7 +92,7 @@ export default function Add() {
           property.paymentExpiryDate = new Date(propertyData.payment_expiry_date).getTime()
           property.type = propertyData.type.value
           property.notes = propertyData.notes
-          property.images = propertyData.images
+          property.images = name
           property.ownerId = propertyData.payer.id
           property.lastModifiedDate = Date.now();
         })
@@ -235,9 +272,10 @@ export default function Add() {
             <View>
               <Text className="text-gray-700 font-semibold mb-2 text-base">Images</Text>
               <View className="p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mb-4 items-center justify-center">
-                <Ionicons name="images-outline" size={40} color="#6B7280" />
-                <Text className="text-gray-500 mt-2 text-center">No images selected</Text>
-                <TouchableOpacity className="mt-3 bg-gray-200 rounded-lg px-4 py-2">
+                {!image && <><Ionicons name="images-outline" size={40} color="#6B7280" />
+                  <Text className="text-gray-500 mt-2 text-center">No images selected</Text></>}
+                {image && <Image source={{ uri: image }} className='w-40 h-40' />}
+                <TouchableOpacity className="mt-3 bg-gray-200 rounded-lg px-4 py-2" onPress={pickImage}>
                   <Text className="text-gray-700 font-medium">Select Images</Text>
                 </TouchableOpacity>
               </View>
@@ -273,7 +311,7 @@ export default function Add() {
         visible={errorModalVisible}
         type="error"
         title="Property Creation Failed"
-        message="We couldn't process your payment. Please check your property details and try again."
+        message="We couldn't add your property. Please check your property details and try again."
         onClose={() => setErrorModalVisible(false)}
         autoCloseTime={0} // Don't auto close error modals
       />

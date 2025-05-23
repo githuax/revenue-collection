@@ -32,7 +32,7 @@ const syncDb = async () => {
         },
         sendCreatedAsUpdated: true,
     }).catch((error) => {
-        console.error('Error syncing database:', error)
+        // console.error('Error syncing database:', error)
     })
 }
 

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Share } from 'react-native'
+import { View, Text, TextInput, ScrollView, TouchableOpacity, SafeAreaView, Alert, ActivityIndicator, Share, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 import database, { payersCollection, propertiesCollection } from '../../db'
@@ -11,6 +11,7 @@ import SelectPayer from '~/components/SelectPayer'
 import DropdownComponent from '~/components/DropDown'
 import { PROPERTY_TYPES } from '~/services/constants'
 import { Q } from '@nozbe/watermelondb'
+import { supabase } from '~/utils/supabase'
 
 export default function PropertyDisplayScreen() {
   const { id } = useLocalSearchParams();
@@ -65,6 +66,15 @@ export default function PropertyDisplayScreen() {
           formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         }
 
+        let image = ''
+        if(propertyRecord.images) {
+          const { data } = supabase.storage
+              .from('property-pics')
+              .getPublicUrl(propertyRecord.images);
+
+            image = data.publicUrl
+        }
+
         // Set form fields for potential editing
         setPropertyData({
           property_ref_no: propertyRecord.propertyRefNo,
@@ -72,10 +82,10 @@ export default function PropertyDisplayScreen() {
           geolocation: propertyRecord.geolocation || '',
           current_assess_value: propertyRecord.currentAssessValue ? propertyRecord.currentAssessValue.toString() : '',
           assess_payment: propertyRecord.assessPayment ? propertyRecord.assessPayment.toString() : '',
-          payment_expiry_date: formattedDate,
+          payment_expiry_date: `${formattedDate}`,
           type: PROPERTY_TYPES.find(type => type === propertyRecord.type) || '',
           notes: propertyRecord.notes || '',
-          images: propertyRecord.images || '',
+          images: image,
           payer: ownerRecord ? {
             id: ownerRecord.id,
             name: ownerRecord.name,
@@ -387,7 +397,7 @@ export default function PropertyDisplayScreen() {
                   <View className="flex-row">
                     <Ionicons name="cash-outline" size={20} color="#4B5563" />
                     <Text className="text-gray-700 ml-2">
-                      ${property?.currentAssessValue ? property.currentAssessValue.toFixed(2) : '0.00'}
+                      {property?.currentAssessValue ? property.currentAssessValue.toFixed(2) : '0.00'} GMD
                     </Text>
                   </View>
                 </View>
@@ -414,7 +424,7 @@ export default function PropertyDisplayScreen() {
                   <View className="flex-row">
                     <Ionicons name="cash-outline" size={20} color="#4B5563" />
                     <Text className="text-gray-700 ml-2">
-                      ${property?.assessPayment ? property.assessPayment : '0.00'}
+                      {property?.assessPayment ? property.assessPayment : '0.00'} GMD
                     </Text>
                   </View>
                 </View>
@@ -504,8 +514,13 @@ export default function PropertyDisplayScreen() {
             <View>
               <Text className="text-gray-700 font-semibold mb-2 text-base">Images</Text>
               <View className="p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mb-4 items-center justify-center">
-                <Ionicons name="images-outline" size={40} color="#6B7280" />
-                <Text className="text-gray-500 mt-2 text-center">No images available</Text>
+                {!property?.images ? 
+                  <> 
+                    <Ionicons name="images-outline" size={40} color="#6B7280" />
+                    <Text className="text-gray-500 mt-2 text-center">No images available</Text>
+                    </> : 
+                    <Image source={{uri: propertyData.images}} className='h-20 w-20' />
+                }
                 {isEditing && (
                   <TouchableOpacity className="mt-3 bg-gray-200 rounded-lg px-4 py-2">
                     <Text className="text-gray-700 font-medium">Select Images</Text>
