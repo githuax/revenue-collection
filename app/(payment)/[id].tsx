@@ -298,6 +298,30 @@ const PaymentDisplayScreen = () => {
       <StatusBar backgroundColor="#2C3E50" barStyle="light-content" />
       <Header
         text={isEditing ? "Edit Payment" : "Payment Details"}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => {
+              const userData = useAuthStore.getState().userData;
+              router.push({
+                pathname: '/printer',
+                params: {
+                  paymentId: payment.ref_no,
+                  payerName: payer ? `${payer.firstName} ${payer.lastName}` : '',
+                  paymentMethod: payment.paymentMethod,
+                  amount: payment.amount,
+                  date: formatDateTime(payment.createdDate),
+                  description: payment.notes || '',
+                  location: payment.location || '',
+                  userName: `${userData?.first_name} ${userData?.last_name}` || '',
+                }
+              })
+            }}
+            className="flex-row items-center space-x-2"
+          >
+            {/* Print */}
+            <Feather name="printer" size={18} color="blue" />
+          </TouchableOpacity>
+        }
       />
 
       <KeyboardAvoidingView

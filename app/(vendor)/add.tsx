@@ -50,6 +50,7 @@ export default function Add() {
         payer.businessType = selectedBusinessTypes;
         payer.createdBy = useAuthStore.getState().userData?.id;
         payer.updatedAt = Date.now();
+        payer.createdAt = Date.now();
         payer.location = location;
       })
     }).then(() => {

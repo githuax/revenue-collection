@@ -9,5 +9,5 @@ interface TempStoreState {
 export const useTempStore = create<TempStoreState>((set) => ({
   data: null,
   setData: (data) => set({ data }),
-  removeData: () => set({ data: null }),
+  removeData: () => set({ data: null })
 }));

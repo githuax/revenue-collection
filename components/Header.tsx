@@ -8,9 +8,11 @@ import syncDb from '~/db/sync';
 type HeaderProps = {
   text: string;
   showBackButton?: boolean;
+  rightComponent?: React.ReactNode;
+  leftComponent?: React.ReactNode;
 };
 
-export default function Header({ text, showBackButton = true }: HeaderProps) {
+export default function Header({ text, showBackButton = true, rightComponent, leftComponent }: HeaderProps) {
   const [connectionType, setConnectionType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,7 +53,8 @@ export default function Header({ text, showBackButton = true }: HeaderProps) {
         )}
         <Text className='text-2xl font-bold tracking-wider'>{text}</Text>
       </View>
-      <View>
+      <View className='flex-row items-center'>
+        {rightComponent}
         {renderWifiIcon()}
       </View>
     </View>

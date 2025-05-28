@@ -1,6 +1,6 @@
-import { View, Text, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import Header from '~/components/Header'
 import { getPayerByTIN } from '~/services/dbService'
 import Payer from '~/db/model/Payer'
@@ -8,6 +8,7 @@ import Chip from '~/components/Chip'
 import EnhancedPayments from '~/components/payer_details/payments'
 import EnhancedInvoices from '~/components/payer_details/invoice'
 import EnhancedProperties from '~/components/payer_details/properties'
+import { FontAwesome5, Ionicons } from '@expo/vector-icons'
 
 const MOCK_INVOICES = [
     { id: '1', amount: 100, date: '2023-01-01', status: 'Paid' },
@@ -43,7 +44,7 @@ const SectionHeader = ({ title, subtitle }) => (
 const ProfileHeader = ({ payer }) => {
     const displayName = payer?.companyName || `${payer?.firstName} ${payer?.lastName}`;
     const isCompany = !!payer?.companyName;
-    
+
     return (
         <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
             {/* Main Name/Company */}
@@ -86,19 +87,19 @@ const ProfileHeader = ({ payer }) => {
 const ContactInfo = ({ payer }) => (
     <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
         <SectionHeader title="Contact Information" />
-        
+
         {payer?.tin && (
             <InfoRow label="Tax ID (TIN)" value={payer.tin} />
         )}
-        
+
         {payer?.phone && (
             <InfoRow label="Phone" value={payer.phone} />
         )}
-        
+
         {payer?.email && (
             <InfoRow label="Email" value={payer.email} />
         )}
-        
+
         {payer?.location && (
             <InfoRow label="Location" value={payer.location} />
         )}
@@ -115,11 +116,11 @@ const AccountSummary = ({ payer }) => {
     return (
         <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
             <SectionHeader title="Account Summary" />
-            
+
             {payer?.createdAt && (
                 <InfoRow label="Account Created" value={formatDate(payer.createdAt)} />
             )}
-            
+
             {payer?.updatedAt && (
                 <InfoRow label="Last Updated" value={formatDate(payer.updatedAt)} />
             )}
@@ -130,7 +131,7 @@ const AccountSummary = ({ payer }) => {
 // Notes component
 const NotesSection = ({ payer }) => {
     if (!payer?.notes) return null;
-    
+
     return (
         <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
             <SectionHeader title="Notes" />
@@ -184,15 +185,39 @@ export default function PayerDetails() {
         )
     }
 
-    const headerTitle = payerDetails?.companyName || 
-                       `${payerDetails?.firstName} ${payerDetails?.lastName}`;
+    const headerTitle = payerDetails?.companyName ||
+        `${payerDetails?.firstName} ${payerDetails?.lastName}`;
 
     return (
         <View className='bg-gray-50 flex-1'>
-            <Header text={headerTitle} />
-            
-            <ScrollView 
-                className='flex-1' 
+            <Header text={headerTitle}
+                rightComponent={
+                    <TouchableOpacity onPress={() => {
+                        router.push({
+                            pathname: '/(vendor)/edit', 
+                            params: {
+                                id: payerDetails.id,
+                                firstName: payerDetails.firstName,
+                                lastName: payerDetails.lastName,
+                                companyName: payerDetails.companyName,
+                                tin: payerDetails.tin,
+                                phone: payerDetails.phone,
+                                email: payerDetails.email,
+                                vendor: payerDetails.vendor,
+                                propertyOwner: payerDetails.propertyOwner,
+                                businessType: payerDetails.businessType,
+                                notes: payerDetails.notes,
+                                location: payerDetails.location
+                            }
+                        })
+                    }}>
+                        <FontAwesome5 name="user-edit" size={16} color="#3B82F6" />
+                    </TouchableOpacity>
+                }
+            />
+
+            <ScrollView
+                className='flex-1'
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 20 }}
             >
