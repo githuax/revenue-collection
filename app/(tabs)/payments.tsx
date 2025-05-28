@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
@@ -11,7 +10,7 @@ import {
   Modal,
   ScrollView
 } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { payersCollection, paymentsCollection } from '~/db';
@@ -117,52 +116,14 @@ const renderPaymentItem = ({ item }) => {
   );
 };
 
+const STATUS_LIST = [
+  'All', 'Pending', 'Conflicted', 'Completed', 'Refunded', 'Cancelled'
+]
+
 const PaymentRecordScreen = () => {
-  const [payments, setPayments] = useState([]);
-  const [filteredPayments, setFilteredPayments] = useState([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterActive, setFilterActive] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [editData, setEditData] = useState({
-    amount: '',
-    method: '',
-    reference: '',
-    status: ''
-  });
-
-  
-
-  
-  // Filter payments based on search query and active filter
-  useEffect(() => {
-    let result = payments;
-
-    if (searchQuery) {
-      result = result.filter(payment =>
-        payment.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.reference.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (activeFilter !== 'All') {
-      result = result.filter(payment => payment.status === activeFilter);
-    }
-
-    setFilteredPayments(result);
-  }, [searchQuery, activeFilter, payments]);
-
-  const filterOptions = ['All', 'Completed', 'Pending', 'Failed'];
-
-  const handleViewPayment = (payment) => {
-    setSelectedPayment(payment);
-    setModalVisible(true);
-    setEditMode(false);
-  };
 
   const Picker = ({ children, selectedValue, onValueChange }) => {
     return (
@@ -203,16 +164,11 @@ const PaymentRecordScreen = () => {
         filterActive={filterActive}
         setFilterActive={() => setFilterModalVisible(true)}
       />
-      
-      <View>
-
-      </View>
 
       {/* Payment List */}
       <View className="flex-1 px-4 py-3">
         <EnhancedPaymentsList
           searchQuery={searchQuery}
-          payments={filteredPayments}
         />
       </View>
 
@@ -226,7 +182,7 @@ const PaymentRecordScreen = () => {
         <Feather name="plus" size={24} color="white" />
       </TouchableOpacity>
 
-      <FilterModal 
+      <FilterModal
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
         onApply={() => setFilterModalVisible(false)} />
@@ -242,6 +198,7 @@ const PaymentsList = ({
   const [paymentsList, setPaymentsList] = useState(payments);
   const [filteredPayments, setFilteredPayments] = useState(payments);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('All');
 
   useEffect(() => {
     const transformedPayments = payments.map((payment) => {
@@ -276,44 +233,66 @@ const PaymentsList = ({
       );
     }
 
+    if (activeFilter !== 'All') {
+      result = result.filter(payment => (payment.status || '').toLowerCase() === activeFilter.toLowerCase());
+    }
+
     setFilteredPayments(result);
     setLoading(false);
-  }, [searchQuery, paymentsList]);
+  }, [searchQuery, paymentsList, activeFilter]);
 
   return (
     <>
-      {loading ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#2C3E50" />
-          <Text className="text-text mt-2">Loading payment records...</Text>
-        </View>
-      ) : filteredPayments.length === 0 ? (
-        <View className="flex-1 justify-center items-center">
-          <Feather name="alert-circle" size={50} color="#8896A6" />
-          <Text className="text-text text-lg mt-4">No payments found</Text>
-          <Text className="text-text/70 text-center mt-2">
-            Try adjusting your search or filters to find what you're looking for
-          </Text>
-        </View>
-      ) : (
-        <>
-          <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-text">
-              {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'} found
-            </Text>
-            <Text className="text-primary-dark font-bold">
-              Total: {filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()} GMD
+      <View style={{flex:1}}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+          {STATUS_LIST.map((status) => (
+            <TouchableOpacity
+              key={status}
+              className={`px-4 py-2 rounded-full mr-2 ${activeFilter === status ? 'bg-primary' : 'bg-gray-200'}`}
+              onPress={() => {
+                setActiveFilter(status);
+              }}
+            >
+              <Text className={`text-sm ${activeFilter === status ? 'text-white' : 'text-text'}`}>{status}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+      <View style={{flex:14}}>
+        {loading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#2C3E50" />
+            <Text className="text-text mt-2">Loading payment records...</Text>
+          </View>
+        ) : filteredPayments.length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <Feather name="alert-circle" size={50} color="#8896A6" />
+            <Text className="text-text text-lg mt-4">No payments found</Text>
+            <Text className="text-text/70 text-center mt-2">
+              Try adjusting your search or filters to find what you're looking for
             </Text>
           </View>
-          <FlatList
-            data={filteredPayments}
-            keyExtractor={(item) => item.id}
-            key={item => item.id}
-            renderItem={renderPaymentItem}
-            showsVerticalScrollIndicator={false}
-          />
-        </>
-      )}</>
+        ) : (
+          <>
+            <View className="flex-row justify-between items-center mb-3">
+              <Text className="text-text">
+                {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'} found
+              </Text>
+              <Text className="text-primary-dark font-bold">
+                Total: {filteredPayments.reduce((sum, p) => sum + p.amount, 0).toLocaleString()} GMD
+              </Text>
+            </View>
+            <FlatList
+              data={filteredPayments}
+              keyExtractor={(item) => item.id}
+              key={item => item.id}
+              renderItem={renderPaymentItem}
+              showsVerticalScrollIndicator={false}
+            />
+          </>
+        )}
+      </View>
+    </>
   )
 }
 
