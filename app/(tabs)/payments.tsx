@@ -77,7 +77,7 @@ const getStatusColor = (status) => {
       return { bg: 'bg-success/20', text: 'text-success' };
     case 'pending':
       return { bg: 'bg-warning/20', text: 'text-warning' };
-    case 'Failed':
+    case 'conflicted':
       return { bg: 'bg-error/20', text: 'text-error' };
     default:
       return { bg: 'bg-gray-200', text: 'text-text' };
@@ -164,201 +164,6 @@ const PaymentRecordScreen = () => {
     setEditMode(false);
   };
 
-  const handleEditPayment = () => {
-    setEditMode(true);
-    setEditData({
-      amount: selectedPayment.amount.toString(),
-      method: selectedPayment.method,
-      reference: selectedPayment.reference,
-      status: selectedPayment.status
-    });
-  };
-
-  const handleSaveEdit = () => {
-    const updatedPayment = {
-      ...selectedPayment,
-      amount: parseFloat(editData.amount),
-      method: editData.method,
-      reference: editData.reference,
-      status: editData.status
-    };
-
-    const updatedPayments = payments.map(payment =>
-      payment.id === updatedPayment.id ? updatedPayment : payment
-    );
-
-    setPayments(updatedPayments);
-    setSelectedPayment(updatedPayment);
-    setEditMode(false);
-  };
-
-  const renderPaymentModal = () => {
-    if (!selectedPayment) return null;
-
-    const statusStyle = getStatusColor(selectedPayment.status);
-
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-xl p-5 h-3/4">
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-text text-xl font-bold">
-                {editMode ? 'Edit Payment' : 'Payment Details'}
-              </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Feather name="x" size={24} color="#36454F" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView className="flex-1">
-              {!editMode ? (
-                <View>
-                  <View className="mb-4">
-                    <Text className="text-text/50 text-sm">Vendor</Text>
-                    <Text className="text-text text-lg">{selectedPayment.vendorName}</Text>
-                  </View>
-
-                  <View className="mb-4">
-                    <Text className="text-text/50 text-sm">Reference</Text>
-                    <Text className="text-text text-lg">{selectedPayment.reference}</Text>
-                  </View>
-
-                  <View className="flex-row mb-4">
-                    <View className="flex-1 mr-2">
-                      <Text className="text-text/50 text-sm">Amount</Text>
-                      <Text className="text-primary-dark text-lg font-bold">
-                        ${selectedPayment.amount.toLocaleString()}
-                      </Text>
-                    </View>
-
-                    <View className="flex-1 ml-2">
-                      <Text className="text-text/50 text-sm">Date</Text>
-                      <Text className="text-text text-lg">{formatDate(selectedPayment.date)}</Text>
-                    </View>
-                  </View>
-
-                  <View className="flex-row mb-4">
-                    <View className="flex-1 mr-2">
-                      <Text className="text-text/50 text-sm">Payment Method</Text>
-                      <Text className="text-text text-lg">{selectedPayment.method}</Text>
-                    </View>
-
-                    <View className="flex-1 ml-2">
-                      <Text className="text-text/50 text-sm">Status</Text>
-                      <View className={`mt-1 px-3 py-1 rounded-full self-start ${statusStyle.bg}`}>
-                        <Text className={`${statusStyle.text}`}>{selectedPayment.status}</Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              ) : (
-                <View>
-                  <View className="mb-4">
-                    <Text className="text-text/50 text-sm mb-1">Vendor</Text>
-                    <Text className="text-text text-lg">{selectedPayment.vendorName}</Text>
-                  </View>
-
-                  <View className="mb-4">
-                    <Text className="text-text/50 text-sm mb-1">Reference</Text>
-                    <TextInput
-                      className="border border-gray-300 rounded-lg p-2 text-text"
-                      value={editData.reference}
-                      onChangeText={(text) => setEditData({ ...editData, reference: text })}
-                    />
-                  </View>
-
-                  <View className="flex-row mb-4">
-                    <View className="flex-1 mr-2">
-                      <Text className="text-text/50 text-sm mb-1">Amount</Text>
-                      <TextInput
-                        className="border border-gray-300 rounded-lg p-2 text-text"
-                        value={editData.amount}
-                        onChangeText={(text) => setEditData({ ...editData, amount: text })}
-                        keyboardType="numeric"
-                      />
-                    </View>
-
-                    <View className="flex-1 ml-2">
-                      <Text className="text-text/50 text-sm mb-1">Date</Text>
-                      <Text className="text-text p-2 border border-gray-300 rounded-lg bg-gray-100">
-                        {formatDate(selectedPayment.date)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View className="flex-row mb-4">
-                    <View className="flex-1 mr-2">
-                      <Text className="text-text/50 text-sm mb-1">Payment Method</Text>
-                      <View className="border border-gray-300 rounded-lg">
-                        <Picker
-                          selectedValue={editData.method}
-                          onValueChange={(value) => setEditData({ ...editData, method: value })}
-                          className="text-text"
-                        >
-                          <Picker.Item label="Bank Transfer" value="Bank Transfer" />
-                          <Picker.Item label="Credit Card" value="Credit Card" />
-                          <Picker.Item label="Cash" value="Cash" />
-                          <Picker.Item label="Check" value="Check" />
-                        </Picker>
-                      </View>
-                    </View>
-
-                    <View className="flex-1 ml-2">
-                      <Text className="text-text/50 text-sm mb-1">Status</Text>
-                      <View className="border border-gray-300 rounded-lg">
-                        <Picker
-                          selectedValue={editData.status}
-                          onValueChange={(value) => setEditData({ ...editData, status: value })}
-                          className="text-text"
-                        >
-                          <Picker.Item label="Completed" value="Completed" />
-                          <Picker.Item label="Pending" value="Pending" />
-                          <Picker.Item label="Failed" value="Failed" />
-                        </Picker>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              )}
-            </ScrollView>
-
-            <View className="flex-row justify-end pt-4 border-t border-gray-200">
-              {!editMode ? (
-                <TouchableOpacity
-                  className="bg-primary py-3 px-6 rounded-lg"
-                  onPress={handleEditPayment}
-                >
-                  <Text className="text-white font-bold">Edit Payment</Text>
-                </TouchableOpacity>
-              ) : (
-                <View className="flex-row">
-                  <TouchableOpacity
-                    className="bg-gray-200 py-3 px-6 rounded-lg mr-3"
-                    onPress={() => setEditMode(false)}
-                  >
-                    <Text className="text-text font-bold">Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="bg-secondary py-3 px-6 rounded-lg"
-                    onPress={handleSaveEdit}
-                  >
-                    <Text className="text-white font-bold">Save Changes</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
-  // For demonstration purposes only - in a real app we'd use a proper Picker component
   const Picker = ({ children, selectedValue, onValueChange }) => {
     return (
       <TouchableOpacity
@@ -392,6 +197,7 @@ const PaymentRecordScreen = () => {
 
       {/* Search Bar */}
       <SearchBar
+        searchText='Search Reference No, Company Name, or Amount...'
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filterActive={filterActive}
@@ -419,9 +225,6 @@ const PaymentRecordScreen = () => {
       >
         <Feather name="plus" size={24} color="white" />
       </TouchableOpacity>
-
-      {/* Payment Details Modal */}
-      {renderPaymentModal()}
 
       <FilterModal 
         visible={filterModalVisible}
@@ -467,7 +270,9 @@ const PaymentsList = ({
     if (searchQuery) {
       result = result.filter(payment =>
         payment.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payment.reference.toLowerCase().includes(searchQuery.toLowerCase())
+        payment.reference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        payment.amount.toString().includes(searchQuery) ||
+        payment.method.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 

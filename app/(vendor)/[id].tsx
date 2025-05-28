@@ -23,6 +23,122 @@ const MOCK_PAYMENTS = [
     { id: '5', amount: 500, date: '2023-05-01', status: 'Pending' },
 ]
 
+// Helper component for info rows
+const InfoRow = ({ label, value, children }) => (
+    <View className='flex-row justify-between items-center py-3 border-b border-gray-100'>
+        <Text className='text-gray-600 text-base font-medium'>{label}</Text>
+        {children || <Text className='text-gray-900 text-base font-semibold flex-1 text-right'>{value}</Text>}
+    </View>
+)
+
+// Helper component for section headers
+const SectionHeader = ({ title, subtitle }) => (
+    <View className='mb-4'>
+        <Text className='text-xl font-bold text-gray-900 mb-1'>{title}</Text>
+        {subtitle && <Text className='text-sm text-gray-500'>{subtitle}</Text>}
+    </View>
+)
+
+// Profile header component
+const ProfileHeader = ({ payer }) => {
+    const displayName = payer?.companyName || `${payer?.firstName} ${payer?.lastName}`;
+    const isCompany = !!payer?.companyName;
+    
+    return (
+        <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
+            {/* Main Name/Company */}
+            <View className='items-center mb-4'>
+                <View className='w-20 h-20 bg-blue-100 rounded-full items-center justify-center mb-3'>
+                    <Text className='text-2xl font-bold text-blue-600'>
+                        {displayName?.charAt(0)?.toUpperCase()}
+                    </Text>
+                </View>
+                <Text className='text-2xl font-bold text-gray-900 text-center'>{displayName}</Text>
+                {isCompany && payer?.firstName && (
+                    <Text className='text-base text-gray-600 mt-1'>
+                        Contact: {payer.firstName} {payer.lastName}
+                    </Text>
+                )}
+            </View>
+
+            {/* Status and Type Chips */}
+            <View className='flex-row justify-center items-center mb-4'>
+                <Chip
+                    text={payer?.propertyOwner ? 'Property Owner' : 'Non-Owner'}
+                    style={payer?.propertyOwner ? 'active' : 'inActive'}
+                />
+                {payer?.vendor && (
+                    <View className='ml-2'>
+                        <Chip text="Vendor" style="active" />
+                    </View>
+                )}
+                {payer?.businessType && (
+                    <View className='ml-2'>
+                        <Chip text={payer.businessType} style="neutral" />
+                    </View>
+                )}
+            </View>
+        </View>
+    )
+}
+
+// Contact information component
+const ContactInfo = ({ payer }) => (
+    <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
+        <SectionHeader title="Contact Information" />
+        
+        {payer?.tin && (
+            <InfoRow label="Tax ID (TIN)" value={payer.tin} />
+        )}
+        
+        {payer?.phone && (
+            <InfoRow label="Phone" value={payer.phone} />
+        )}
+        
+        {payer?.email && (
+            <InfoRow label="Email" value={payer.email} />
+        )}
+        
+        {payer?.location && (
+            <InfoRow label="Location" value={payer.location} />
+        )}
+    </View>
+)
+
+// Account summary component
+const AccountSummary = ({ payer }) => {
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString();
+    };
+
+    return (
+        <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
+            <SectionHeader title="Account Summary" />
+            
+            {payer?.createdAt && (
+                <InfoRow label="Account Created" value={formatDate(payer.createdAt)} />
+            )}
+            
+            {payer?.updatedAt && (
+                <InfoRow label="Last Updated" value={formatDate(payer.updatedAt)} />
+            )}
+        </View>
+    )
+}
+
+// Notes component
+const NotesSection = ({ payer }) => {
+    if (!payer?.notes) return null;
+    
+    return (
+        <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
+            <SectionHeader title="Notes" />
+            <Text className='text-gray-700 text-base leading-6'>{payer.notes}</Text>
+        </View>
+    )
+}
+
 export default function PayerDetails() {
     const localParams = useLocalSearchParams();
 
@@ -60,41 +176,53 @@ export default function PayerDetails() {
     }, [])
 
     if (isLoading) {
-        return <ActivityIndicator />
+        return (
+            <View className='flex-1 bg-gray-50 justify-center items-center'>
+                <ActivityIndicator size="large" color="#3B82F6" />
+                <Text className='text-gray-600 mt-4 text-base'>Loading payer details...</Text>
+            </View>
+        )
     }
 
+    const headerTitle = payerDetails?.companyName || 
+                       `${payerDetails?.firstName} ${payerDetails?.lastName}`;
+
     return (
-        <View className='bg-background flex-1'>
-            <Header
-                text={`${payerDetails?.firstName} ${payerDetails?.lastName}`}
-            />
-            <ScrollView className='flex-1'>
-                <View className='p-4'>
-                    <Text className='text-text/70 text-lg'>Tax ID: {payerDetails?.tin}</Text>
-                    <Text className='text-text/70 text-lg'>Phone: {payerDetails?.phone}</Text>
-                    <Text className='text-text/70 text-lg'>Address: {payerDetails?.address}</Text>
-                    <View className='flex-row items-center'>
-                        <Text className='text-text/70 text-lg'>Status: </Text>
-                        <Chip
-                            text={payerDetails?.propertyOwner ? 'Active' : 'Inactive'}
-                            style={payerDetails?.propertyOwner ? 'active' : 'inActive'}
-                        />
-                    </View>
+        <View className='bg-gray-50 flex-1'>
+            <Header text={headerTitle} />
+            
+            <ScrollView 
+                className='flex-1' 
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 20 }}
+            >
+                {/* Profile Header */}
+                <ProfileHeader payer={payerDetails} />
+
+                {/* Contact Information */}
+                <ContactInfo payer={payerDetails} />
+
+                {/* Account Summary */}
+                <AccountSummary payer={payerDetails} />
+
+                {/* Notes Section */}
+                <NotesSection payer={payerDetails} />
+
+                {/* Payments Section */}
+                <View className='mt-4'>
+                    <EnhancedPayments payerDetails={payerDetails} />
                 </View>
 
-                {/* Payments Owned */}
-                <EnhancedPayments payerDetails={payerDetails} />
+                {/* Properties Section */}
+                <View className='mt-4'>
+                    <EnhancedProperties payerDetails={payerDetails} />
+                </View>
 
-                {/* Properties Owned */}
-                <EnhancedProperties payerDetails={payerDetails} />
-
-                {/* Invoices Generated for this Payer */}
-                <EnhancedInvoices payerDetails={payerDetails} />
+                {/* Invoices Section */}
+                <View className='mt-4'>
+                    <EnhancedInvoices payerDetails={payerDetails} />
+                </View>
             </ScrollView>
         </View>
     )
-}
-
-const styles = {
-
 }

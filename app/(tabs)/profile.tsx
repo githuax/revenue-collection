@@ -85,8 +85,7 @@ const Profile = () => {
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{userData?.first_name} {userData?.last_name}</Text>
               <Text style={styles.profileId}>ID: {userData?.id}</Text>
-              <Text style={styles.profileDepartment}>{user.department}</Text>
-              <Text style={styles.profilePosition}>{user.position}</Text>
+              <Text style={styles.profileDepartment}>{userData?.profile}</Text>
             </View>
             {/* <TouchableOpacity 
               style={styles.editButton}
@@ -299,10 +298,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#36454F', // Charcoal
     marginBottom: 2,
-  },
-  profilePosition: {
-    fontSize: 14,
-    color: '#6B7C93',
+    textTransform: 'capitalize',
   },
   editButton: {
     padding: 8,

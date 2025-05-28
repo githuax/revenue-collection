@@ -12,7 +12,7 @@ import PaymentsMonth from '~/components/dashboard/payments_month';
 import PaymentsToday from '~/components/dashboard/payments_today';
 import PaymentsWeek from '~/components/dashboard/payments_week';
 import RecentPayments from '~/components/dashboard/recent_payments';
-import DashboardActionTiles from '~/components/DashboardActionTiles';
+import DashboardActionTilesMin from '~/components/DashboardActionTilesMin';
 import DashboardStats from '~/components/DashboardStats';
 import Header from '~/components/Header';
 import useAuthStore from '~/store/authStore';
@@ -45,7 +45,7 @@ const Home = () => {
         {/* <DashboardStats /> */}
 
         {/* Quick Actions */}
-        <DashboardActionTiles />
+        <DashboardActionTilesMin />
 
         {/* Recent Payments */}
         <RecentPayments />

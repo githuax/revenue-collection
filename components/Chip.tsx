@@ -27,6 +27,10 @@ const styles: Record<string, ChipStyle> = {
         background: 'bg-green-500',
         text: 'text-white'
     },
+    neutral: {
+        background: 'bg-gray-300',
+        text: 'text-gray-800'
+    },
     inActive: {
         background: 'bg-gray-500',
         text: 'text-white'
@@ -43,8 +47,8 @@ export default function Chip({
     style
 }: ChipProps) {
   return (
-    <View className={`px-3 py-1 rounded-full ${styles[style].background}`}>
-      <Text className={`${styles[style].text}`}>{ text }</Text>
+    <View className={`px-3 py-1 rounded-full ${styles[style]?.background}`}>
+      <Text className={`${styles[style]?.text}`}>{ text }</Text>
     </View>
   )
 }

@@ -29,6 +29,19 @@ import SelectInvoice from '~/components/SelectInvoice';
 import useAuthStore from '~/store/authStore';
 import { Q } from '@nozbe/watermelondb';
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'synced':
+      return { bg: 'bg-success/20', text: 'text-success' };
+    case 'pending':
+      return { bg: 'bg-warning/20', text: 'text-warning' };
+    case 'conflicted':
+      return { bg: 'bg-error/20', text: 'text-error' };
+    default:
+      return { bg: 'bg-gray-200', text: 'text-text' };
+  }
+};
+
 const PaymentDisplayScreen = () => {
   const { id } = useLocalSearchParams();
   const [payment, setPayment] = useState(null);
@@ -302,9 +315,9 @@ const PaymentDisplayScreen = () => {
                     Created: {payment && formatDateTime(payment.createdDate)}
                   </Text>
                 </View>
-                <View className={`px-3 py-1 rounded-full ${payment?.status === DB_SYNC_STATUS.SYNCED ? 'bg-green-100' : 'bg-yellow-100'}`}>
-                  <Text className={`text-sm font-medium ${payment?.status === DB_SYNC_STATUS.SYNCED ? 'text-green-700' : 'text-yellow-700'}`}>
-                    {payment?.status === DB_SYNC_STATUS.SYNCED ? 'Synced' : 'Pending'}
+                <View className={`px-3 py-1 rounded-full ${getStatusColor(payment?.status).bg}`}>
+                  <Text className={`text-sm capitalize font-medium ${getStatusColor(payment?.status).text}`}>
+                    {payment?.status}
                   </Text>
                 </View>
               </View>

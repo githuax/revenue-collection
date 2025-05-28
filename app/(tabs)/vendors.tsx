@@ -57,12 +57,7 @@ const renderVendorItem = ({ item }) => {
           </View>
         </View>
         <View className="items-start">
-          <Text className="text-primary-dark font-bold">${(item.balance || '').toLocaleString()}</Text>
-          <TouchableOpacity className="mt-2" onPress={() => {
-
-          }}>
-            <Feather name="chevron-right" size={20} color="#2C3E50" />
-          </TouchableOpacity>
+          <Feather name="chevron-right" size={20} color="#2C3E50" />
         </View>
       </View>
     </TouchableOpacity>
@@ -86,6 +81,7 @@ const VendorScreen = () => {
 
       {/* Search Bar */}
       <SearchBar
+        searchText='Search with Tax ID, Name or Phone...'
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         filterActive={filterActive}
@@ -161,7 +157,8 @@ const PayersList = ({
     if (searchQuery) {
       result = result.filter(payer =>
         payer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        payer.taxId.toLowerCase().includes(searchQuery.toLowerCase())
+        payer.taxId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        payer.phone.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 

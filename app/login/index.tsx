@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  ActivityIndicator,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -28,12 +27,20 @@ const LogoPlaceholder = () => (
 );
 
 const LoginScreen = () => {
-  return (
-    <View className='flex-1 items-center justify-center'>
-      <ActivityIndicator size="large" color="#3498DB" />
-    </View>
-  )
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const { user, login } = useAuthStore();
+
+  const handleLogin = () => {
+    login(email, password)
+  };
+
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,9 +1,15 @@
 import React from 'react'
-import { Tabs } from 'expo-router'
+import { router, Tabs } from 'expo-router'
 
 import { MaterialIcons } from '@expo/vector-icons'
+import useAuthStore from '~/store/authStore';
 
 export default function Layout() {
+    const { user } = useAuthStore();
+    if (!user) {
+        router.replace('/')
+    }
+
     return (
         <Tabs screenOptions={{
             headerShown: false,

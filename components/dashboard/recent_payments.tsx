@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { withObservables } from '@nozbe/watermelondb/react'
 import { paymentsCollection, payersCollection } from '~/db'
@@ -7,6 +7,7 @@ import useAuthStore from '~/store/authStore'
 import { map, switchAll } from 'rxjs/operators'
 import { Model } from '@nozbe/watermelondb'
 import { Feather } from '@expo/vector-icons'
+import { router } from 'expo-router'
 
 interface Payer extends Model {
     firstName: string;
@@ -23,7 +24,8 @@ type PaymentModel = Model & {
 
 const statusColors: Record<string,string> = {
     synced: 'bg-[#22c55e]',
-    pending: 'bg-amber-300'
+    pending: 'bg-amber-300',
+    conflicted: 'bg-red-500',
 }
 
 const formatDate = (dateString: string) => {
@@ -44,7 +46,11 @@ const RenderPayment = ({ payment, payer }: RenderPaymentProps) => {
     const createdDate = payment._raw.created_date || payment._raw.createdDate || new Date().toISOString()
     
     return (
-        <View className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'>
+        <TouchableOpacity className='bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-100'
+            onPress={() => {
+                router.push(`/(payment)/${payment.ref_no}`);
+            }}
+        >
             <View className='flex-row justify-between items-start mb-2'>
                 <View className='flex-1'>
                     <Text className='text-gray-500 text-sm mb-1'>{formatDate(createdDate)}</Text>
@@ -62,7 +68,7 @@ const RenderPayment = ({ payment, payer }: RenderPaymentProps) => {
                 </View>
                 <Text className='text-primary-dark font-bold'>{payment.amount.toLocaleString()} GMD</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     )
 }
 

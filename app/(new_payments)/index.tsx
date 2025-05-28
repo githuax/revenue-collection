@@ -18,7 +18,7 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 
-import database from '~/db';
+import database, { paymentsCollection } from '~/db';
 import Payment from '~/db/model/Payment';
 import SelectPayer from '~/components/SelectPayer';
 import { DB_SYNC_STATUS, PAYMENT_METHODS } from '~/services/constants';
@@ -29,6 +29,7 @@ import ReferenceNumber from '~/components/ReferenceNumber';
 import SelectInvoice from '~/components/SelectInvoice';
 import useAuthStore from '~/store/authStore';
 import StatusModal from '~/components/modals/Status';
+import { Q } from '@nozbe/watermelondb';
 
 const NewPaymentScreen = () => {
   const { payerId, payerName, payerAddress, payerPhone, payerTIN } = useLocalSearchParams();
@@ -115,6 +116,20 @@ const NewPaymentScreen = () => {
       return;
     }
 
+    // check if a payment for the current vendor already exists on the DB
+    // if yes in that case we will have a conflict
+    const nowDate = new Date();
+    const todayDate = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate());
+    todayDate.setHours(0, 0, 0, 0);
+    const timestampToday = todayDate.getTime();
+
+    const paymentForToday = await paymentsCollection.query(
+      Q.and(
+        Q.where('payer_id', selectedVendor.id as string),
+        Q.where('created_date', Q.gte(timestampToday)),
+      )
+    )
+
     database.write(async () => {
       const payment = await database.get<Payment>('payments').create(payment => {
         payment.amount = parseFloat(amount);
@@ -122,7 +137,7 @@ const NewPaymentScreen = () => {
         payment.location = locationText;
         payment.invoice = invoice;
         payment.payer_id = selectedVendor.id;
-        payment.status = DB_SYNC_STATUS.PENDING;
+        payment.status = paymentForToday.length ? DB_SYNC_STATUS.CONFLICTED : DB_SYNC_STATUS.PENDING;
         payment.createdBy = useAuthStore.getState().userData?.id || '';
         payment.createdDate = new Date();
         payment.notes = description;
