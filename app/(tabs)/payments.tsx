@@ -117,7 +117,7 @@ const renderPaymentItem = ({ item }) => {
 };
 
 const STATUS_LIST = [
-  'All', 'Pending', 'Conflicted', 'Completed', 'Refunded', 'Cancelled'
+  'All', 'Pending', 'Conflicted', 'Synced', 'Refunded', 'Cancelled'
 ]
 
 const PaymentRecordScreen = () => {
