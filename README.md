@@ -1,46 +1,52 @@
 # Cal-Trac
 
-A comprehensive mobile application built with React Native and Expo for managing revenue collection, payments, and vendor management. Cal-Trac streamlines the process of tracking payments, managing vendors, and handling property-related transactions, making it an essential tool for property managers and revenue collectors.
+A comprehensive mobile application built with React Native and Expo for managing revenue collection, payments, vendor management, and property transactions. Cal-Trac streamlines the process of tracking payments, managing vendors, handling property-related transactions, and printing invoices/receipts, making it an essential tool for property managers and revenue collectors.
 
 ## Features
 
 - 🔐 **Secure Authentication System**
-  - Email-based authentication
+  - Email-based authentication (Supabase)
   - Secure password management
-  - Session persistence
+  - Session persistence (Zustand)
   - Protected routes and data
 
 - 💰 **Payment Management**
-  - Track incoming and outgoing payments
-  - Payment history and analytics
-  - Automated payment reminders
+  - Track, add, and edit payments
+  - Payment history and analytics (dashboard: today, week, month, recent)
+  - Automated payment reminders (planned)
   - Multiple payment method support
   - Payment status tracking
 
 - 👥 **Vendor Management**
   - Vendor profiles and contact information
-  - Payment history per vendor
-  - Vendor performance metrics
-  - Document management for vendors
-  - Communication history
+  - Add, edit, and view vendors
+  - Payment and property history per vendor
+  - Vendor performance metrics (planned)
+  - Document management for vendors (planned)
+  - Communication history (planned)
 
 - 🏢 **Property Management**
-  - Property details and specifications
+  - Add, edit, and view property details
   - Occupancy tracking
-  - Maintenance schedules
+  - Maintenance schedules (planned)
   - Property value tracking
   - Location-based services
 
-- 📊 **Invoice Generation**
+- 📊 **Dashboard & Analytics**
+  - Payments analytics (today, week, month, recent)
+  - Quick stats and action tiles
+
+- 🧾 **Invoice Generation & Printing**
   - Customizable invoice templates
   - Automated invoice generation
   - PDF export functionality
   - Invoice tracking and status
   - Payment reconciliation
 
+- **Bluetooth thermal printer integration** (with custom permissions)
+
 - 📱 **Cross-platform Support**
-  - Native iOS application
-  - Native Android application
+  - Native iOS and Android applications
   - Consistent UI/UX across platforms
   - Platform-specific optimizations
 
@@ -58,6 +64,10 @@ A comprehensive mobile application built with React Native and Expo for managing
   - Custom animations
   - Accessibility features
 
+- 🔌 **Printer & Bluetooth Permissions**
+  - Bluetooth printer support (thermal receipts)
+  - Custom permission handling for Android (Bluetooth, Location)
+
 ## Tech Stack
 
 - **Framework**: React Native with Expo
@@ -69,6 +79,8 @@ A comprehensive mobile application built with React Native and Expo for managing
 - **Icons**: Expo Vector Icons
 - **Forms**: React Native Elements
 - **Date Handling**: React Native Date Picker
+- **Printer**: react-native-thermal-receipt-printer, react-native-ble-plx
+- **Permissions**: Custom Bluetooth/location permissions for Android
 
 ## Prerequisites
 
@@ -113,43 +125,56 @@ yarn start
 - `npm start` - Start the Expo development server with hot reloading
 - `npm run ios` - Run the app on iOS simulator with development client
 - `npm run android` - Run the app on Android emulator with development client
+- `npm run web` - Run the app in a web browser
 - `npm run build:dev` - Build development version with debug features
 - `npm run build:preview` - Build preview version for testing
 - `npm run build:prod` - Build production version with optimizations
 - `npm run lint` - Run ESLint for code quality checks
 - `npm run format` - Format code with Prettier for consistent style
+- `npm run prebuild` - Prepare native code for EAS builds
 
 ## Project Structure
 
 ```
 cal-trac/
 ├── app/                    # Main application code
-│   ├── (tabs)/            # Tab-based navigation
-│   │   ├── index.tsx      # Home screen
-│   │   ├── payments.tsx   # Payments management
-│   │   ├── vendors.tsx    # Vendor management
-│   │   └── profile.tsx    # User profile
-│   ├── (payment)/         # Payment related screens
-│   ├── (invoice)/         # Invoice related screens
+│   ├── (tabs)/            # Tab-based navigation (Home, Payments, Vendors, Profile)
+│   ├── (payment)/         # Payment-related screens
+│   ├── (invoice)/         # Invoice-related screens
 │   ├── (vendor)/          # Vendor management screens
-│   └── (property)/        # Property management screens
+│   ├── (property)/        # Property management screens
+│   ├── (new_payments)/    # New payment flow screens
+│   ├── printer/           # Printer integration screens
+│   ├── login/             # Authentication screens
+│   ├── _layout.tsx        # App layout
+│   └── index.tsx          # App entry point
 ├── components/            # Reusable components
-├── store/                 # State management
-│   └── authStore.ts       # Authentication state
+│   ├── dashboard/         # Dashboard analytics components
+│   ├── payer_details/     # Payer details components
+│   ├── modals/            # Modal dialogs (e.g., Register Property)
+│   ├── settings/          # Settings components
+│   └── ...                # Other UI components
+├── db/                    # Database models and migrations
+│   ├── model/             # WatermelonDB models
+│   ├── schema/            # WatermelonDB schema
+│   ├── migrations/        # Database migrations
+│   ├── index.ts           # DB entry point
+│   └── sync.ts            # Sync logic
 ├── services/              # API and service integrations
 │   ├── constants.ts       # Constants
-│   └── dbService.ts       # Common DB Queries
+│   ├── dbService.ts       # Common DB Queries
+│   └── printerService.ts  # Printer logic
+├── store/                 # State management (Zustand stores)
+│   ├── authStore.ts       # Authentication state
+│   ├── tempStore.ts       # Temporary state
+│   └── mock_data.js       # Mock data for development
 ├── utils/                 # Utility functions
 │   ├── supabase.ts        # Supabase Configs
 │   └── migrations/        # Supabase Migrations
+├── permissions/           # Custom permissions (Bluetooth, etc.)
 ├── types/                 # TypeScript type definitions
-├── assets/                # Static assets
-│   ├── images/            # Image assets
-│   └── fonts/             # Font files
-└── db/                    # Database models and migrations
-    ├── models/            # WatermelonDB models
-    ├── schema/            # WatermelonDB schema
-    └── migrations/        # Database migrations
+├── assets/                # Static assets (images, fonts)
+└── ...                    # Config files, scripts, etc.
 ```
 
 ## Environment Setup

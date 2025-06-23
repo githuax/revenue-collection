@@ -11,6 +11,7 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
+  ToastAndroid,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -35,7 +36,9 @@ const LoginScreen = () => {
   const { user, login } = useAuthStore();
 
   const handleLogin = () => {
-    login(email, password)
+    login(email, password).catch((error) => {
+      ToastAndroid.show('Invalid credentials',20)
+    })
   };
 
   if (user) {

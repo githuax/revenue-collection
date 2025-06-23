@@ -1,6 +1,6 @@
 import { View, Text, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { router, useLocalSearchParams } from 'expo-router'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import Header from '~/components/Header'
 import { getPayerByTIN } from '~/services/dbService'
 import Payer from '~/db/model/Payer'
@@ -8,7 +8,8 @@ import Chip from '~/components/Chip'
 import EnhancedPayments from '~/components/payer_details/payments'
 import EnhancedInvoices from '~/components/payer_details/invoice'
 import EnhancedProperties from '~/components/payer_details/properties'
-import { FontAwesome5, Ionicons } from '@expo/vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons'
+import { useIsFocused } from '@react-navigation/native'
 
 const MOCK_INVOICES = [
     { id: '1', amount: 100, date: '2023-01-01', status: 'Paid' },
@@ -117,12 +118,12 @@ const AccountSummary = ({ payer }) => {
         <View className='bg-white mx-4 mt-4 rounded-xl shadow-sm border border-gray-100 p-6'>
             <SectionHeader title="Account Summary" />
 
-            {payer?.createdAt && (
-                <InfoRow label="Account Created" value={formatDate(payer.createdAt)} />
+            {payer?.created_at && (
+                <InfoRow label="Account Created" value={formatDate(payer.created_at)} />
             )}
 
-            {payer?.updatedAt && (
-                <InfoRow label="Last Updated" value={formatDate(payer.updatedAt)} />
+            {payer?.updated_at && (
+                <InfoRow label="Last Updated" value={formatDate(payer.updated_at)} />
             )}
         </View>
     )
@@ -145,6 +146,7 @@ export default function PayerDetails() {
 
     const [payerDetails, setPayerDetails] = useState<Payer>(undefined);
     const [isLoading, setIsLoading] = useState(true);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         getPayerByTIN(localParams?.id).then((data) => {
@@ -174,7 +176,7 @@ export default function PayerDetails() {
 
             setIsLoading(false);
         })
-    }, [])
+    }, [isFocused])
 
     if (isLoading) {
         return (

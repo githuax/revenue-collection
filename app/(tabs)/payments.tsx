@@ -243,7 +243,7 @@ const PaymentsList = ({
 
   return (
     <>
-      <View style={{flex:1}}>
+      <View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
           {STATUS_LIST.map((status) => (
             <TouchableOpacity
@@ -258,7 +258,7 @@ const PaymentsList = ({
           ))}
         </ScrollView>
       </View>
-      <View style={{flex:14}}>
+      <View>
         {loading ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#2C3E50" />

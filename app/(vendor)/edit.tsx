@@ -13,7 +13,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { BUSINESS_TYPES } from '~/services/constants'
 import useAuthStore from '~/store/authStore'
 import { Feather, Ionicons } from '@expo/vector-icons'
-import { Model } from '@nozbe/watermelondb'
+import { Model, Q } from '@nozbe/watermelondb'
 
 export default function Edit() {
     const data = useLocalSearchParams();
@@ -40,25 +40,22 @@ export default function Edit() {
         setSelectedBusinessTypes(selectedValues[0]);
     };
 
-    const addPayer = () => {
-        database.write(async () => {
-            const payer = await payersCollection.find(data?.id as string) as Payer;
-            console.log('Updating payer:', payer);
-
-            await payer.update(() => {
-                payer.firstName = firstName;
-                payer.lastName = lastName;
-                payer.email = email;
-                payer.phone = phone;
-                payer.location = location;
-                payer.tin = tin;
-                payer.propertyOwner = isPropertyOwner;
-                payer.vendor = isVendor;
-                payer.businessType = selectedBusinessTypes[0] || '';
-                payer.lastModifiedBy = useAuthStore.getState().userData?.id || 'system';
-                payer.updatedAt = new Date();
-            });
-
+    const editPayer = async () => {
+        await database.write(async () => {
+            const payerToUpdate = await payersCollection.find(data?.id as string);
+            
+            payerToUpdate.update(() => {
+                payerToUpdate.firstName = firstName;
+                payerToUpdate.lastName = lastName;
+                payerToUpdate.email = email;
+                payerToUpdate.phone = phone;
+                payerToUpdate.location = location;
+                payerToUpdate.propertyOwner = Boolean(isPropertyOwner);
+                payerToUpdate.vendor = Boolean(isVendor);
+                payerToUpdate.businessType = selectedBusinessTypes[0] || '';
+                payerToUpdate.lastModifiedBy = useAuthStore.getState().userData?.id;
+                payerToUpdate.updated_at = new Date();
+            })
         }).then(() => {
             setSuccessModalVisible(true);
         }).catch((error) => {
@@ -243,7 +240,7 @@ export default function Edit() {
                     {/* Save button */}
                     <TouchableOpacity
                         className='bg-blue-600 rounded-xl p-4 mb-8 shadow-md'
-                        onPress={addPayer}
+                        onPress={editPayer}
                     >
                         <View className="flex-row items-center justify-center space-x-2">
                             <Text className='text-white text-center font-bold text-lg'>Save Payer</Text>
@@ -254,11 +251,11 @@ export default function Edit() {
                     <StatusModal
                         visible={successModalVisible}
                         type="success"
-                        title="Payer Added Successfully!"
-                        message="The payer has been added successfully."
+                        title="Payer Updated Successfully!"
+                        message="The payer has been updated successfully."
                         onClose={() => {
                             setSuccessModalVisible(false);
-                            router.push(`/(vendor)/${tin}`)
+                            router.back();
                         }}
                         autoCloseTime={5000} // Auto close after 5 seconds
                     />

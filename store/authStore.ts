@@ -11,7 +11,7 @@ type AuthStore = {
     user: User | null;
     userData: UserData | null;
     session: Session | null;
-    login: (email: string, password: string) => void;
+    login: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 

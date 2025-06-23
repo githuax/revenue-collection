@@ -48,7 +48,15 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ]
+      ],
+      [
+          "react-native-ble-plx",
+          {
+            "isBackgroundEnabled": true,
+            "modes": ["peripheral", "central"],
+            "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices"
+          }
+        ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -76,7 +84,9 @@
       },
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "package": "com.fireblaze1234.caltrac"
     },

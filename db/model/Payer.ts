@@ -17,8 +17,8 @@ export default class Payer extends Model {
   @field('notes') notes
   @field('created_by') createdBy
   @field('last_modified_by') lastModifiedBy
-  @date('created_datetime') createdAt
-  @date('last_modified_date') updatedAt
+  @date('created_datetime') created_at
+  @date('last_modified_date') updated_at
   @field('location') location
 
   get toObject() {
