@@ -1,0 +1,161 @@
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-900">Properties</h2>
+    <a href="/properties/new" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+        <i class="fas fa-building mr-2"></i>Add Property
+    </a>
+</div>
+
+<!-- Search and Filters -->
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" id="search" name="search" placeholder="Search properties..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                <select id="type-filter" name="type" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Types</option>
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>
+                    <option value="industrial">Industrial</option>
+                    <option value="land">Land</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="owner-filter" class="block text-sm font-medium text-gray-700 mb-2">Owner</label>
+                <input type="text" id="owner-filter" name="owner" placeholder="Filter by owner..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
+                <select id="status-filter" name="status" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All Statuses</option>
+                    <option value="current">Current</option>
+                    <option value="expired">Expired</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4 flex space-x-2">
+            <button onclick="filterProperties()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-search mr-2"></i>Filter
+            </button>
+            <button onclick="clearFilters()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                <i class="fas fa-times mr-2"></i>Clear
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Properties Grid -->
+<div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Property cards will be loaded here -->
+    <div class="col-span-full text-center py-8">
+        <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-4"></i>
+        <p class="text-gray-500">Loading properties...</p>
+    </div>
+</div>
+
+<!-- Property Card Template (hidden) -->
+<template id="property-card-template">
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
+        <div class="property-image-container h-48 bg-gray-200 rounded-t-lg relative overflow-hidden">
+            <img class="property-image w-full h-full object-cover" src="/images/default-property.jpg" alt="Property">
+            <div class="absolute top-2 right-2">
+                <span class="property-status-badge px-2 py-1 text-xs font-medium rounded-full">
+                    Current
+                </span>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="property-ref-no font-semibold text-gray-900"></h3>
+                    <p class="property-type text-sm text-gray-600"></p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="editProperty(this)" class="text-blue-600 hover:text-blue-800 transition duration-200" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteProperty(this)" class="text-red-600 hover:text-red-800 transition duration-200" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="space-y-2">
+                <div class="flex items-start text-sm text-gray-600">
+                    <i class="fas fa-map-marker-alt w-4 mr-2 mt-0.5"></i>
+                    <span class="property-address"></span>
+                </div>
+                <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-user w-4 mr-2"></i>
+                    <span class="property-owner"></span>
+                </div>
+                <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-dollar-sign w-4 mr-2"></i>
+                    <span class="property-assessment"></span>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Payment Expiry:</span>
+                    <span class="property-expiry font-medium">-</span>
+                </div>
+                <div class="flex justify-between text-sm mt-1">
+                    <span class="text-gray-600">Last Modified:</span>
+                    <span class="property-modified font-medium">-</span>
+                </div>
+            </div>
+            
+            <div class="mt-4 flex space-x-2">
+                <a href="#" class="property-view-link flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded text-sm transition duration-200">
+                    View Details
+                </a>
+                <a href="#" class="property-invoices-link flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-3 rounded text-sm transition duration-200">
+                    Invoices
+                </a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Pagination -->
+<div class="bg-white rounded-lg shadow mt-6 px-6 py-4">
+    <div class="flex items-center justify-between">
+        <div class="flex-1 flex justify-between sm:hidden">
+            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Previous
+            </button>
+            <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Next
+            </button>
+        </div>
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700">
+                    Showing <span class="font-medium" id="showing-from">1</span> to <span class="font-medium" id="showing-to">10</span> of
+                    <span class="font-medium" id="total-properties-count">0</span> results
+                </p>
+            </div>
+            <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" id="pagination">
+                    <!-- Pagination will be generated here -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/properties.js"></script>

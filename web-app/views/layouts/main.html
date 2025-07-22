@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cal-Trac - Revenue Collection Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-xl font-bold">Cal-Trac</h1>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="/dashboard" class="hover:text-blue-200 transition duration-200">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                        </a>
+                        <a href="/payments" class="hover:text-blue-200 transition duration-200">
+                            <i class="fas fa-credit-card mr-2"></i>Payments
+                        </a>
+                        <a href="/vendors" class="hover:text-blue-200 transition duration-200">
+                            <i class="fas fa-users mr-2"></i>Vendors
+                        </a>
+                        <a href="/properties" class="hover:text-blue-200 transition duration-200">
+                            <i class="fas fa-building mr-2"></i>Properties
+                        </a>
+                        <a href="/invoices" class="hover:text-blue-200 transition duration-200">
+                            <i class="fas fa-file-invoice mr-2"></i>Invoices
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:block">
+                        <span id="user-name" class="text-sm">Welcome, User</span>
+                    </div>
+                    <button onclick="logout()" class="bg-blue-700 hover:bg-blue-800 px-3 py-2 rounded transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-6">
+        {{content}}
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        <p>&copy; 2024 Cal-Trac. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
