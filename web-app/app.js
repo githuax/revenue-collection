@@ -165,11 +165,16 @@ app.use((err, req, res, next) => {
             ...(isDevelopment && { error: err.message, stack: err.stack })
         });
     } else {
-        res.status(500).renderWithLayout('error', {
-            title: 'Server Error',
-            message: 'Internal server error',
-            ...(isDevelopment && { error: err.message })
-        });
+        res.status(500).send(`
+            <html>
+                <head><title>Server Error</title></head>
+                <body>
+                    <h1>Server Error</h1>
+                    <p>Internal server error occurred.</p>
+                    ${isDevelopment ? `<pre>${err.message}\n${err.stack}</pre>` : ''}
+                </body>
+            </html>
+        `);
     }
 });
 
@@ -181,10 +186,16 @@ app.use((req, res) => {
             message: 'Not found'
         });
     } else {
-        res.status(404).renderWithLayout('error', {
-            title: 'Page Not Found',
-            message: 'The page you requested could not be found.'
-        });
+        res.status(404).send(`
+            <html>
+                <head><title>Page Not Found</title></head>
+                <body>
+                    <h1>Page Not Found</h1>
+                    <p>The page you requested could not be found.</p>
+                    <a href="/">Go Home</a>
+                </body>
+            </html>
+        `);
     }
 });
 

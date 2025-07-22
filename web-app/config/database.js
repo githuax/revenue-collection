@@ -1,22 +1,33 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Database configuration
+// Database configuration for Supabase
 const dbConfig = {
     user: process.env.DB_USER || 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'cal_trac',
+    database: process.env.DB_NAME || 'postgres',
     password: process.env.DB_PASSWORD || 'password',
     port: process.env.DB_PORT || 5432,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false }
 };
 
-// Alternative: Use Supabase connection string if provided
-const connectionString = process.env.DATABASE_URL || process.env.SUPABASE_URL;
+// Use Supabase connection string if provided, otherwise use individual config
+const connectionString = process.env.DATABASE_URL;
 
 const pool = connectionString 
-    ? new Pool({ connectionString, ssl: { rejectUnauthorized: false } })
-    : new Pool(dbConfig);
+    ? new Pool({ 
+        connectionString, 
+        ssl: { rejectUnauthorized: false },
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000
+    })
+    : new Pool({
+        ...dbConfig,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000
+    });
 
 // Test database connection
 pool.on('connect', () => {
